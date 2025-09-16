@@ -1,0 +1,100 @@
+body {
+    background-color: #000;
+    color: #fff;
+    margin: 0;
+}
+
+/* Navbar */
+nav {
+    display: flex;
+    align-items: center;
+    border-top: 1px solid #333;
+    border-bottom: 1px solid #333;
+}
+
+#loginsignup {
+    justify-self: end;
+    text-align: right;
+    height: 50px;
+    width: 150px;
+    background-image: url(./images/profile-dark.png);
+    background-position: 10%;
+    background-repeat: no-repeat;
+    background-size: 20% auto;
+}
+
+#container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+#wordle {
+    width: 550px;
+}
+
+#guesses {
+    margin: 20px 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    height: fit-content;
+}
+
+.letter {
+    box-sizing: border-box;
+    display: inline-flex;
+    height: 70px;
+    width: 70px;
+    border: 2px solid #333;
+    margin: 0;
+}
+
+#keyboard {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.keyRow {
+    display: flex;
+    align-items: center;
+}
+
+.key {
+    color: #fff;
+    background-color: #868686;
+    border: none;
+    border-radius: 4px;
+    box-sizing: border-box;
+    height: 60px;
+    margin: 2px;
+    transition: filter 0.3s ease;
+    font-weight: bold;
+}
+
+.hover-effect {
+    cursor: pointer;
+    filter: brightness(90%);
+}
+
+.keyLetter {
+    width: 50px;
+    font-size: 25px;
+}
+
+.actionBtn {
+    width: 75px;
+}
+
+#enter {
+    font-size: 18px;
+}
+
+#backspace {
+    display: inline-flex;
+    background-image: url(./images/backspace-dark.png);
+    background-repeat: no-repeat;
+    background-size: 70% auto;
+    background-position: center;
+}

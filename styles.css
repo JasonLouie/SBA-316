@@ -2,6 +2,13 @@ body {
     background-color: #000;
     color: #fff;
     margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+:root {
+    --yellow-bg: rgb(97, 97, 52);
+    --green-bg: rgb(42, 82, 42);
+    --gray-bg: rgb(44,44,44);
 }
 
 /* Navbar */
@@ -12,15 +19,64 @@ nav {
     border-bottom: 1px solid #333;
 }
 
-#loginsignup {
-    justify-self: end;
+nav > h1 {
+    user-select: none;
+    margin: 0 0 0 20px;
+}
+
+.navElement {
+    border: none;
+    background: none;
+    color: #fff;
+    transition: filter 0.3s ease;
+    margin-right: 15px;
+}
+
+.navElement:hover {
+    filter: brightness(70%);
+    cursor: pointer;
+}
+
+#settingsBtn {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background-image: url(./images/settings-dark.png);
+    background-position: 50%;
+    background-repeat: no-repeat;
+    background-size: 90% auto;
+    margin-left: auto;
+}
+
+#instructionsBtn {
+    border: 3px solid #fff;
+    font-size: 19px;
+    font-weight: 1000;
+    border-radius: 50%;
+    height: 35px;
+    width: 35px;
+}
+
+#login-signup-div {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
     text-align: right;
+    margin-right: 20px;
     height: 50px;
-    width: 150px;
+    width: 140px;
+    border: none;
+    color: #fff;
     background-image: url(./images/profile-dark.png);
     background-position: 10%;
     background-repeat: no-repeat;
-    background-size: 20% auto;
+    background-size: 15% auto;
+}
+
+.nav-hover-effect {
+    cursor: pointer;
+    text-decoration: underline;
+    user-select: none;
 }
 
 #container {
@@ -41,19 +97,35 @@ nav {
     height: fit-content;
 }
 
-.letter {
-    box-sizing: border-box;
-    display: inline-flex;
-    height: 70px;
-    width: 70px;
-    border: 2px solid #333;
-    margin: 0;
+.typed {
+    background-color: #222;
+    border-color: #555 !important;
 }
 
+.guess {
+    display: flex;
+}
+
+.letter {
+    box-sizing: border-box;
+    user-select: none;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 40px;
+    height: 70px;
+    width: 70px;
+    border: 2px solid #383838;
+    margin: 3px;
+    transition: background-color 0.3s border-color 1s ease;
+}
+
+/* Web keyboard */
 #keyboard {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    user-select: none;
 }
 
 .keyRow {
@@ -73,7 +145,7 @@ nav {
     font-weight: bold;
 }
 
-.hover-effect {
+.key-hover-effect {
     cursor: pointer;
     filter: brightness(90%);
 }
@@ -97,4 +169,111 @@ nav {
     background-repeat: no-repeat;
     background-size: 70% auto;
     background-position: center;
+}
+
+/* Overlay for settings and login/signup */
+#overlay {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+}
+
+#settings {
+    background-color: #282828;
+    width: 600px;
+    height: 500px;
+}
+
+#signup-form {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-wrap: wrap;
+    background-color: #282828;
+    width: 350px;
+    height: 600px;
+    border-radius: 22px;
+    box-shadow: 2px 4px rgba(55, 55, 55, 0.4);
+}
+
+#login-form {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-wrap: wrap;
+    background-color: #282828;
+    width: 350px;
+    height: 480px;
+    border-radius: 22px;
+    box-shadow: 2px 4px rgba(55, 55, 55, 0.4);
+}
+
+form > h1 {
+    font-size: 35px;
+}
+
+form > p {
+    margin-top: 30px;
+    margin-bottom: 0;
+}
+
+button.login {
+    background-color: rgb(22, 141, 221) !important;
+}
+
+span.login {
+    color: rgb(22, 141, 221) !important;
+}
+
+button.signup {
+    background-color: rgb(235, 183, 42) !important;
+}
+
+span.signup {
+    color: rgb(235, 183, 42) !important;
+}
+
+#form-mode {
+    display: flex;
+    justify-content: space-between;
+    width: 260px;
+    border: 1px solid #555;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
+
+#form-mode > button{
+    width: 125px;
+    height: 44px;
+    border-radius: 10px;
+    border: none;
+    background: none;
+    color: #fff;
+    font-size: 18px;
+}
+
+.field {
+    box-sizing: border-box;
+    border: none;
+    height: 50px;
+    width: 260px;
+    padding: 4px 10px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
+
+#submit {
+    height: 50px;
+    width: 260px;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
 }

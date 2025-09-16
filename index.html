@@ -9,12 +9,28 @@
     <body>
         <nav>
             <h1>WORDLE</h1>
-            <button type="button" value="settings">Settings</button>
-            <button type="button" value="instructions">Instructions</button>
-            <button type="button" value="loginsignup" id="loginsignup">Login/Sign Up</button>
+            <button
+                type="button"
+                value="settings"
+                class="navElement"
+                id="settingsBtn"
+            ></button>
+            <button
+                type="button"
+                value="instructions"
+                class="navElement"
+                id="instructionsBtn"
+            >
+                ?
+            </button>
+            <div id="login-signup-div">
+                <span id="loginNav">Login</span>/<span id="signupNav"
+                    >Sign Up</span
+                >
+            </div>
         </nav>
         <div id="container">
-            <div id="wordle">
+            <main id="wordle">
                 <div id="guesses">
                     <div class="guess">
                         <p class="letter"></p>
@@ -59,8 +75,38 @@
                         <p class="letter"></p>
                     </div>
                 </div>
-                <div id="keyboard">
+                <div id="alert">
+                    <p id="alertText"></p>
                 </div>
+                <div id="keyboard"></div>
+            </main>
+            <div id="overlay">
+                <form id="login-form">
+                    <h1>Login Form</h1>
+                    <div id="form-mode">
+                        <button type="button" class="login">Login</button>
+                        <button type="button">Sign Up</button>
+                    </div>
+                    <input
+                        type="text"
+                        name="username"
+                        placeholder="Username"
+                        class="field"
+                        autocomplete="username"
+                    />
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="Password"
+                        class="field"
+                        autocomplete="new-password"
+                    />
+                    <button type="submit" id="submit" class="login">Login</button>
+                    <p>
+                        Don't have an account?
+                        <span class="signup">Sign Up</span>
+                    </p>
+                </form>
             </div>
         </div>
         <script src="./script.js"></script>

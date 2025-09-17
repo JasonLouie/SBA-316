@@ -76,37 +76,120 @@
                     </div>
                 </div>
                 <div id="alert">
-                    <p id="alertText"></p>
+                    <p id="alertText">Word does not exist</p>
                 </div>
-                <div id="keyboard"></div>
+                <div id="keyboard">
+                    <div class="keyRow">
+                        <button type="button" class="key keyLetter" value="q">
+                            Q
+                        </button>
+                        <button type="button" class="key keyLetter" value="w">
+                            W
+                        </button>
+                        <button type="button" class="key keyLetter" value="e">
+                            E
+                        </button>
+                        <button type="button" class="key keyLetter" value="r">
+                            R
+                        </button>
+                        <button type="button" class="key keyLetter" value="t">
+                            T
+                        </button>
+                        <button type="button" class="key keyLetter" value="y">
+                            Y
+                        </button>
+                        <button type="button" class="key keyLetter" value="u">
+                            U
+                        </button>
+                        <button type="button" class="key keyLetter" value="i">
+                            I
+                        </button>
+                        <button type="button" class="key keyLetter" value="o">
+                            O
+                        </button>
+                        <button type="button" class="key keyLetter" value="p">
+                            P
+                        </button>
+                    </div>
+                    <div class="keyRow">
+                        <button type="button" class="key keyLetter" value="a">
+                            A
+                        </button>
+                        <button type="button" class="key keyLetter" value="s">
+                            S
+                        </button>
+                        <button type="button" class="key keyLetter" value="d">
+                            D
+                        </button>
+                        <button type="button" class="key keyLetter" value="f">
+                            F
+                        </button>
+                        <button type="button" class="key keyLetter" value="g">
+                            G
+                        </button>
+                        <button type="button" class="key keyLetter" value="h">
+                            H
+                        </button>
+                        <button type="button" class="key keyLetter" value="j">
+                            J
+                        </button>
+                        <button type="button" class="key keyLetter" value="k">
+                            K
+                        </button>
+                        <button type="button" class="key keyLetter" value="l">
+                            L
+                        </button>
+                    </div>
+                    <div class="keyRow">
+                        <button
+                            type="button"
+                            class="key actionBtn actions"
+                            value="enter"
+                            id="enter"
+                        >
+                            Enter
+                        </button>
+                        <button type="button" class="key keyLetter" value="z">
+                            Z
+                        </button>
+                        <button type="button" class="key keyLetter" value="x">
+                            X
+                        </button>
+                        <button type="button" class="key keyLetter" value="c">
+                            C
+                        </button>
+                        <button type="button" class="key keyLetter" value="v">
+                            V
+                        </button>
+                        <button type="button" class="key keyLetter" value="b">
+                            B
+                        </button>
+                        <button type="button" class="key keyLetter" value="n">
+                            N
+                        </button>
+                        <button type="button" class="key keyLetter" value="m">
+                            M
+                        </button>
+                        <button
+                            type="button"
+                            class="key actionBtn"
+                            value="backspace"
+                            id="backspace"
+                        ></button>
+                    </div>
+                </div>
             </main>
             <div id="overlay">
-                <form id="login-form">
-                    <h1>Login Form</h1>
+                <div id="results">
+                    <h1>Results</h1>
+                    <p>
+                        Want to view your past results? Login or sign up below!
+                    </p>
                     <div id="form-mode">
                         <button type="button" class="login">Login</button>
                         <button type="button">Sign Up</button>
                     </div>
-                    <input
-                        type="text"
-                        name="username"
-                        placeholder="Username"
-                        class="field"
-                        autocomplete="username"
-                    />
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="Password"
-                        class="field"
-                        autocomplete="new-password"
-                    />
-                    <button type="submit" id="submit" class="login">Login</button>
-                    <p>
-                        Don't have an account?
-                        <span class="signup">Sign Up</span>
-                    </p>
-                </form>
+                </div>
             </div>
         </div>
         <script src="./script.js"></script>

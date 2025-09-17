@@ -1,44 +1,53 @@
-const keyPos = [
-    { q: [0, 0], w: [0, 1], e: [0, 2], r: [0, 3], t: [0, 4], y: [0, 5], u: [0, 6], i: [0, 7], o: [0, 8], p: [0, 9] },
-    { a: [1, 0], s: [1, 1], d: [1, 2], f: [1, 3], g: [1, 4], h: [1, 5], j: [1, 6], k: [1, 7], l: [1, 8] },
-    { enter: [2, 0], z: [2, 1], x: [2, 2], c: [2, 3], v: [2, 4], b: [2, 5], n: [2, 6], m: [2, 7], backspace: [2, 8] }
-]
+// Object containing information on web keyboard. Used to quickly access the specific key
+const keyDict = {
+    q: { row: 0, col: 0 }, w: { row: 0, col: 1 }, e: { row: 0, col: 2 }, r: { row: 0, col: 3 }, t: { row: 0, col: 4 }, y: { row: 0, col: 5 }, u: { row: 0, col: 6 }, i: { row: 0, col: 7 }, o: { row: 0, col: 8 }, p: { row: 0, col: 9 },
+    a: { row: 1, col: 0 }, s: { row: 1, col: 1 }, d: { row: 1, col: 2 }, f: { row: 1, col: 3 }, g: { row: 1, col: 4 }, h: { row: 1, col: 5 }, j: { row: 1, col: 6 }, k: { row: 1, col: 7 }, l: { row: 1, col: 8 },
+    z: { row: 2, col: 1 }, x: { row: 2, col: 2 }, c: { row: 2, col: 3 }, v: { row: 2, col: 4 }, b: { row: 2, col: 5 }, n: { row: 2, col: 6 }, m: { row: 2, col: 7 }
+};
 
 // Object containing information to create the sign up form
 const signUpForm = {
     h1: { textContent: "Sign Up" },
-    div: { id: "form-mode", button: [
-        {type: "button", textContent: "Login"}, 
-        {type: "button", textContent: "Sign Up", className: "signup"}
-    ]},
+    div: {
+        id: "form-mode", button: [
+            { type: "button", textContent: "Login" },
+            { type: "button", textContent: "Sign Up", className: "signup" }
+        ]
+    },
     input: [
-        {type: "text", name: "username", placeholder: "Username", className: "field", autocomplete: "username"},
-        {type: "email", name: "email", placeholder: "Email", className: "field", autocomplete: "email"},
-        {type: "password", name: "password", placeholder: "Password", className: "field", autocomplete: "new-password"},
-        {type: "password", name: "confirmPassword", placeholder: "Confirm password", className: "field"}
+        { type: "text", name: "username", placeholder: "Username", className: "field", autocomplete: "username" },
+        { type: "email", name: "email", placeholder: "Email", className: "field", autocomplete: "email" },
+        { type: "password", name: "password", placeholder: "Password", className: "field", autocomplete: "new-password" },
+        { type: "password", name: "confirmPassword", placeholder: "Confirm password", className: "field" }
     ],
-    button: {type: "button", textContent: "Sign Up", id: "submit", className: "signup"},
-    p: {innerHTML: 'Already have an account? <span class="login">Login</span>'}
+    button: { type: "button", textContent: "Sign Up", id: "submit", className: "signup" },
+    p: { innerHTML: 'Already have an account? <span class="login">Login</span>' }
 }
 
 // Object containing information to create the login form
 const loginForm = {
     h1: { textContent: "Login" },
-    div: { id: "form-mode", button: [
-        {type: "button", textContent: "Login", className: "login"}, 
-        {type: "button", textContent: "Sign Up"}
-    ]},
+    div: {
+        id: "form-mode", button: [
+            { type: "button", textContent: "Login", className: "login" },
+            { type: "button", textContent: "Sign Up" }
+        ]
+    },
     input: [
-        {type: "text", name: "username", placeholder: "Username", className: "field", autocomplete: "username"},
-        {type: "password", name: "password", placeholder: "Password", className: "field", autocomplete: "new-password"},
+        { type: "text", name: "username", placeholder: "Username", className: "field", autocomplete: "username" },
+        { type: "password", name: "password", placeholder: "Password", className: "field", autocomplete: "current-password" },
     ],
-    button: {type: "button", textContent: "Login", id: "submit", className: "login"},
-    p: {innerHTML: `Don't have an account? <span class="signup">Sign Up</span>`}
+    button: { type: "button", textContent: "Login", id: "submit", className: "login" },
+    p: { innerHTML: `Don't have an account? <span class="signup">Sign Up</span>` }
 }
 
-const wordList = ["audio", "range", "avert", "house", "etch", "itch", "sully"]
-const answer = wordList[Math.floor(Math.random() * wordList.length)];
+const wordList = ["audio", "range", "avert", "house", "latch", "itchy", "sully"]
+// const answer = wordList[Math.floor(Math.random() * wordList.length)];
+const answer = "trust";
+// console.log(answer);
 const maxGuesses = 6;
+const pastGuesses = [];
+const letterColors = {}; // Used to color letters green or gray (exists/does not exist)
 
 let guessPos = 0; // Index of the guess (row of the guess)
 let letterPos = 0; // Index of the letter of the current guess
@@ -48,32 +57,33 @@ const webKeyboard = document.getElementById("keyboard");
 const loginSignUpDiv = document.getElementById("login-signup-div");
 const overlayDiv = document.getElementById("overlay");
 
-// Creates the interactive web keyboard
-function createWebKeyboard() {
-    const frag = document.createDocumentFragment();
-    for (const row of keyPos) {
-        const keyRow = frag.appendChild(document.createElement("div"));
-        keyRow.classList.add("keyRow");
-        for (const key in row) {
-            const keyButton = keyRow.appendChild(document.createElement("button"));
-            keyButton.value = key;
-            keyButton.classList.add("key");
-            if (key.length === 1) { // Letter
-                keyButton.textContent = key.toUpperCase();
-                keyButton.classList.add("keyLetter");
-            } else {
-                if (key === "enter") { // Enter button only
-                    keyButton.textContent = "Enter";
-                }
-                keyButton.classList.add("actionBtn");
-                keyButton.id = key.toLowerCase();
-            }
+
+
+// Handles hovering over spans (expected to be login/sign up text)
+function handleSpanHover(e) {
+    e.preventDefault();
+    if (e.target.localName === "span") {
+        e.target.classList.toggle("nav-hover-effect");
+        if (e.target.parentElement.localName != "p") {
+            e.target.classList.toggle(((e.target.textContent.toLowerCase()).includes("sign") ? "signup" : "login"));
         }
     }
-    webKeyboard.appendChild(frag);
 }
 
-// Do this every time a key on the interactive web keyboard is hovered over
+// Handles clicking spans (expected to be login/sign up text)
+function handleSpanClick(e) {
+    e.preventDefault();
+    if (e.target.localName === "span") {
+        if (overlayDiv.style.display === "none") {
+            overlayDiv.style.display = "flex";
+            document.body.removeEventListener("keydown", handleUserKeyboard);
+        }
+        overlayDiv.removeChild(overlayDiv.firstElementChild);
+        createOverlay((loginSignUpDiv.contains(e.target)) ? e.target.id.slice(0, e.target.id.length - 3) : createOverlay(e.target.classList[0]));
+    }
+}
+
+// Handles hovering over a key on the interactive web keyboard
 function handleKeyHover(e) {
     e.preventDefault();
     if (e.target.localName === "button") {
@@ -81,29 +91,7 @@ function handleKeyHover(e) {
     }
 }
 
-function handleSpanHover(e) {
-    e.preventDefault();
-    if (e.target.localName === "span") {
-        e.target.classList.toggle("nav-hover-effect");
-        if(e.target.parentElement.localName != "p"){
-            e.target.classList.toggle(((e.target.textContent.toLowerCase()).includes("sign") ? "signup" : "login"));
-        }
-    }
-}
-
-function handleSpanClick(e) {
-    e.preventDefault();
-    if (e.target.localName === "span") {
-        console.log("Clicked span!");
-        if (overlayDiv.style.display === "none"){
-            overlayDiv.style.display = "flex";
-            document.body.removeEventListener("keydown", handleUserKeyboard);
-        }
-        overlayDiv.removeChild(overlayDiv.firstElementChild);
-        createOverlay((loginSignUpDiv.contains(e.target))? e.target.id.slice(0, e.target.id.length - 3) : createOverlay(e.target.classList[0]));        
-    }
-}
-
+// Handles button presses on web keyboard
 function handleWebKeyboard(e) {
     e.preventDefault();
     if (e.target.localName === "button" && e.target.classList.contains("key")) {
@@ -111,6 +99,7 @@ function handleWebKeyboard(e) {
     }
 }
 
+// Handles user's keyboard input
 function handleUserKeyboard(e) {
     e.preventDefault();
     if (e instanceof KeyboardEvent && !e.repeat) {
@@ -120,21 +109,68 @@ function handleUserKeyboard(e) {
 
 // Handles adding/removing letter keys or action keys
 function handleInput(letter) {
+    const indexColors = {}; // Local letter colors
+    const ansLetters = letterCounter(answer);
+    const colorDict = { valid: "var(--green-bg)", exists: "var(--yellow-bg)", nonexistent: "var(--gray-bg)" };
     if (letter.length === 1 && (letterPos >= 0 && letterPos < 5)) { // Handle letters
         addLetter(letter);
     } else if (letter === "enter") { // Handle complete guesses
         const userGuess = getGuess();
         if (userGuess.length < 5) { // Guess is too short
 
-        } else if (userGuess === answer) { // Correct answer
+        } else if(pastGuesses.includes(userGuess)) { // Repeated guess
 
+        }else if (userGuess === answer) { // Correct answer
+            checkValidPositions(userGuess);
+            endGame();
+            createOverlay("win");
+        } else {
+            // Find any letters in the user's guess that is in the correct position
+            checkValidPositions(userGuess);
+
+            // Filter the answer and guess to no exclude the matched letters
+            const filteredAnswer = (Object.keys(indexColors).length > 0) ? filterAnswer() : answer;
+
+            // Check which remaining letters exist or don't exist in the answer
+            checkExistsNotExists(userGuess, filteredAnswer);
+            displayGuessColors(); // Update guess to show colors
+            displayKeyboardColors(); // Update colors on web keyboard
+            letterPos = 0;
+            guessPos++;
+            pastGuesses.push(userGuess);
+            if (guessPos >= maxGuesses) {
+                endGame();
+                createOverlay("lose");
+            }
         }
     } else if (letter === "backspace") {
         removeLetter();
     }
 
-    function displayGuessColors() {
+    // Ends the game
+    function endGame() {
+        // Remove all event listeners related to playing the game
+        document.body.removeEventListener("keydown", handleUserKeyboard);
+        webKeyboard.removeEventListener("mouseover", handleKeyHover);
+        webKeyboard.removeEventListener("mouseout", handleKeyHover);
+        webKeyboard.removeEventListener("click", handleWebKeyboard);
+        overlayDiv.style.display = "flex";
+    }
 
+    // Updates the colors of the guess's letters based on valid, existing, and nonexisting indexes
+    function displayGuessColors() {
+        for (const index in indexColors) {
+            guesses.children[guessPos].children[index].style.border = "none";
+            guesses.children[guessPos].children[index].style.backgroundColor = colorDict[indexColors[index]];
+        }
+    }
+
+    // Updates colors of the web keyboard's keys based on valid, existing, and nonexisting letters
+    function displayKeyboardColors() {
+        for(const letter in letterColors){
+            // Use keyDict to set the key at that specific row and col to correct color
+            webKeyboard.children[keyDict[letter].row].children[keyDict[letter].col].style.backgroundColor = colorDict[letterColors[letter]];
+        }
     }
 
     // Adds a letter to the guess
@@ -151,30 +187,88 @@ function handleInput(letter) {
         guesses.children[guessPos].children[letterPos].classList.remove("typed");
     }
 
+    // Combines all input from the current row into a five letter word
     function getGuess() {
         let word = "";
         for (const letter of guesses.children[guessPos].children) {
             word += letter.textContent;
         }
-        return word;
+        return word.toLowerCase();;
+    }
+
+    // Removes letters from answer based on the correct indexes the user guessed
+    function filterAnswer() {
+        console.log("Filtering answer...")
+        let filteredAnswer = "";
+        for (let i = 0; i < answer.length; i++) {
+            if (indexColors[i] === "valid") {
+                ansLetters[answer[i]]--; // Update the letter count
+            } else {
+                filteredAnswer += answer[i];
+            }
+        }
+        console.log(`Filtered answer is ${filteredAnswer}`);
+        return filteredAnswer;
+    }
+
+    // Returns an object of key-value pair letter: count
+    function letterCounter(word) {
+        const counter = {};
+        for (const letter of word) {
+            if (counter[letter]) {
+                counter[letter]++;
+            } else {
+                counter[letter] = 1;
+            }
+        }
+        return counter;
+    }
+
+    // Finds indexes where the guess's letter is at the correct position and updates valid letters for keyboard
+    function checkValidPositions(guess) {
+        for (let i = 0; i < guess.length; i++) {
+            if (guess[i] === answer[i]) {
+                indexColors[i] = "valid";
+                letterColors[guess[i]] = "valid";
+            }
+        }
+    }
+
+    // Check if letters not set as valid from the user's guess are included in the remaining letters of the answer. Updates the global object for showing web keyboard colors and the local object (object in this instance) for the current user's guess.
+    function checkExistsNotExists(guess, answer) {
+        console.log(`Comparing ${guess} to ${answer}`);
+        for (let i = 0; i < guess.length; i++) {
+            if (indexColors[i] === "valid") {
+                continue;
+            } else if (answer.includes(guess[i]) && ansLetters[guess[i]] > 0) {
+                ansLetters[guess[i]]--;
+                indexColors[i] = "exists";
+                if (letterColors[guess[i]] != "valid") {
+                    letterColors[guess[i]] = "exists";
+                }
+            } else {
+                indexColors[i] = "nonexistent";
+                letterColors[guess[i]] = "nonexistent";
+            }
+        }
     }
 }
 
-// Refactor to only create the frag and update
+// Creates the frag within the overlay
 function createOverlay(type) {
     const frag = document.createDocumentFragment();
     if (type === "login") {
         const form = frag.appendChild(document.createElement("form"));
         form.id = "login-form";
-        for (const elementTag in loginForm){
-            if (elementTag === "div"){
+        for (const elementTag in loginForm) {
+            if (elementTag === "div") {
                 const div = form.appendChild(document.createElement(elementTag));
                 div.id = loginForm[elementTag].id;
-                for(const buttonAttr of loginForm[elementTag].button){
+                for (const buttonAttr of loginForm[elementTag].button) {
                     div.appendChild(Object.assign(document.createElement("button"), buttonAttr));
                 }
-            } else if (elementTag === "input"){
-                for(const inputAttr of loginForm[elementTag]){
+            } else if (elementTag === "input") {
+                for (const inputAttr of loginForm[elementTag]) {
                     form.appendChild(Object.assign(document.createElement(elementTag), inputAttr));
                 }
             } else { // h1 and submit button
@@ -184,21 +278,24 @@ function createOverlay(type) {
     } else if (type === "signup") {
         const form = frag.appendChild(document.createElement("form"));
         form.id = "signup-form";
-        for (const elementTag in signUpForm){
-            if (elementTag === "div"){
+        for (const elementTag in signUpForm) {
+            if (elementTag === "div") {
                 const div = form.appendChild(document.createElement(elementTag));
                 div.id = signUpForm[elementTag].id;
-                for(const buttonAttr of signUpForm[elementTag].button){
+                for (const buttonAttr of signUpForm[elementTag].button) {
                     div.appendChild(Object.assign(document.createElement("button"), buttonAttr));
                 }
-            } else if (elementTag === "input"){
-                for(const inputAttr of signUpForm[elementTag]){
+            } else if (elementTag === "input") {
+                for (const inputAttr of signUpForm[elementTag]) {
                     form.appendChild(Object.assign(document.createElement(elementTag), inputAttr));
                 }
             } else { // h1 and submit button
                 form.appendChild(Object.assign(document.createElement(elementTag), signUpForm[elementTag]));
             }
         }
+    } else if (type === "win" || type === "lose") {
+        const div = frag.appendChild(document.createElement("div"));
+        div.id = "results";
     }
     overlayDiv.appendChild(frag);
     overlayDiv.style.display = "flex";
@@ -206,23 +303,23 @@ function createOverlay(type) {
 
 function closeOverlay(e) {
     e.preventDefault();
-    if (!overlayDiv.firstElementChild.contains(e.target)){ // Clicked outside of the firstElementChild
+    if (!overlayDiv.firstElementChild.contains(e.target)) { // Clicked outside of the firstElementChild
         overlayDiv.style.display = "none";
         document.body.addEventListener("keydown", handleUserKeyboard);
     }
     // Otherwise clicked inside firstElementChild
 }
 
-// 4 Scenarios:
-// First open -> 
-// Check if overLayDiv has a child or is still display flex
-// Display flex if necessary, then create frag and add the child to overLayDiv
-// still open -> remove the child, then recreate as needed
-// Clicked outside -> remove child then display none
+// Create the function to show alerts for invalid guesses. Use setTimeOut or something for delaying so the alert is displayed for a reasonable amount of time.
 
-// Main stuff
+// Create the results pop up, settings pop up, and instructions pop up.
+// Maybe for results, show how long it took for each guess (maybe) and number of guesses it took
+// Settings - dark mode toggle (do research)
+// Instructions - Just show how to play the game. Maybe an interactive side scroller with guesses and examples?
+// Form validation!
+// Go back to rubric and see what needs to be added (what is missing?)
 
-
+// Adding eventlisteners
 webKeyboard.addEventListener("mouseover", handleKeyHover);
 webKeyboard.addEventListener("mouseout", handleKeyHover);
 webKeyboard.addEventListener("click", handleWebKeyboard);
@@ -232,11 +329,4 @@ document.body.addEventListener("mouseover", handleSpanHover);
 document.body.addEventListener("mouseout", handleSpanHover);
 
 document.body.addEventListener("keydown", handleUserKeyboard);
-
 overlayDiv.addEventListener("click", closeOverlay);
-
-document.onreadystatechange = () => {
-    if (document.readyState === "interactive") {
-        createWebKeyboard();
-    }
-};

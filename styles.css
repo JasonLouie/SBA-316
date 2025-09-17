@@ -86,6 +86,7 @@ nav > h1 {
 }
 
 #wordle {
+    position: relative;
     width: 550px;
 }
 
@@ -118,6 +119,23 @@ nav > h1 {
     border: 2px solid #383838;
     margin: 3px;
     transition: background-color 0.3s border-color 1s ease;
+}
+
+/* Alert overlay for invalid guesses */
+#alert {
+    display: block;
+    position: absolute;
+    border-radius: 10px;
+    bottom: 40%;
+    left: calc(50% - 120px);
+    background-color: rgba(55, 55, 55, 0.8);
+    width: 240px;
+    height: 60px;
+    display: none;
+}
+
+#alertText {
+    text-align: center;
 }
 
 /* Web keyboard */
@@ -232,11 +250,11 @@ span.login {
 }
 
 button.signup {
-    background-color: rgb(235, 183, 42) !important;
+    background-color: rgb(197, 159, 52) !important;
 }
 
 span.signup {
-    color: rgb(235, 183, 42) !important;
+    color: rgb(197, 159, 52) !important;
 }
 
 #form-mode {
@@ -276,4 +294,19 @@ span.signup {
     border-radius: 10px;
     font-size: 18px;
     font-weight: bold;
+    transition: filter 0.3 ease;
+}
+
+#submit:hover {
+    cursor: pointer;
+    filter: brightness(110%);
+}
+
+#form-errors {
+    display: none;
+}
+
+#results {
+    height: 500px;
+    width: 400px;
 }

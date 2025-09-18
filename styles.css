@@ -199,6 +199,7 @@ nav > h1 {
     height: 100%;
     width: 100%;
     background-color: rgba(0, 0, 0, 0.5);
+    z-index: 10;
     /* display: none; */
 }
 
@@ -209,44 +210,50 @@ nav > h1 {
 }
 
 .loginsignupform {
-    display: flex;
-    justify-content: center;
-    align-content: center;
+    position: relative;
     flex-wrap: wrap;
     background-color: #282828;
+    height: 550px;
     width: 400px;
     border-radius: 22px;
     box-shadow: 2px 4px rgba(55, 55, 55, 0.4);
+    z-index: 101;
 }
 
 #signup-form {
-    height: 550px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    height: 100%;
 }
 
 #login-form {
-    height: 500px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    height: 100%;
 }
 
 form > h1 {
     font-size: 45px;
-    margin: 0 0 20px 0;
+    margin: 30px 0 10px 0;
 }
 
 form > p {
-    margin-top: 30px;
-    margin-bottom: 0;
+    margin-bottom: 20px;
 }
 
-button.login {
+
+button.login, p.login {
     background-color: rgb(22, 141, 221) !important;
+}
+
+button.signup, p.signup {
+    background-color: rgb(197, 159, 52) !important;
 }
 
 span.login {
     color: rgb(22, 141, 221) !important;
-}
-
-button.signup {
-    background-color: rgb(197, 159, 52) !important;
 }
 
 span.signup {
@@ -256,20 +263,34 @@ span.signup {
 #form-mode {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    height: 48px;
     width: 300px;
     border: 1px solid #555;
     margin-bottom: 30px;
     border-radius: 10px;
 }
 
-#form-mode > button{
-    width: 140px;
-    height: 50px;
+.unselected {
+    width: 45%;
+}
+
+.selected {
+    width: 55%;
+}
+
+.selectable {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+    height: 100%;
     border-radius: 10px;
     border: none;
     background: none;
     color: #fff;
     font-size: 22px;
+    text-align: center;
 }
 
 .field {
@@ -278,12 +299,12 @@ span.signup {
     height: 40px;
     width: 260px;
     padding: 4px 10px;
-    margin-bottom: 25px;
+    margin-bottom: 15px;
     border-radius: 10px;
 }
 
 #submit {
-    height: 50px;
+    height: 48px;
     width: 260px;
     color: #fff;
     border: none;

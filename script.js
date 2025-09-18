@@ -9,9 +9,9 @@ const keyDict = {
 const signUpForm = {
     h1: { textContent: "Sign Up" },
     div: {
-        id: "form-mode", button: [
-            { type: "button", textContent: "Login" },
-            { type: "button", textContent: "Sign Up", className: "signup" }
+        id: "form-mode", p: [
+            { textContent: "Login", className: "selectable unselected" },
+            { textContent: "Sign Up", className: "signup selectable selected" }
         ]
     },
     input: [
@@ -21,15 +21,16 @@ const signUpForm = {
     ],
     button: { type: "submit", textContent: "Sign Up", id: "submit", className: "signup" },
     p: { innerHTML: 'Already have an account? <span class="login">Login</span>' }
+    // p: { innerHTML: 'Already have an account?' }
 }
 
 // Object containing information to create the login form
 const loginForm = {
     h1: { textContent: "Login" },
     div: {
-        id: "form-mode", button: [
-            { type: "button", textContent: "Login", className: "login" },
-            { type: "button", textContent: "Sign Up" }
+        id: "form-mode", p: [
+            { textContent: "Login", className: "login selectable selected" },
+            { textContent: "Sign Up", className: "selectable unselected" }
         ]
     },
     input: [
@@ -38,6 +39,7 @@ const loginForm = {
     ],
     button: { type: "submit", textContent: "Login", id: "submit", className: "login" },
     p: { innerHTML: `Don't have an account? <span class="signup">Sign Up</span>` }
+    // p: { innerHTML: `Don't have an account?` }
 }
 
 const wordList = ["audio", "range", "avert", "house", "latch", "itchy", "sully"]
@@ -71,14 +73,12 @@ function handleSpanHover(e) {
 function handleSpanClick(e) {
     e.preventDefault();
     if (e.target.localName === "span") {
-        console.log("Clicked span")
         if (overlayDiv.style.display === "none") {
             overlayDiv.style.display = "flex";
             document.body.removeEventListener("keydown", handleUserKeyboard);
         }
         overlayDiv.removeChild(overlayDiv.firstElementChild);
-        console.log(overlayDiv.children);
-        createOverlay((loginSignUpDiv.contains(e.target)) ? e.target.id.slice(0, e.target.id.length - 3) : createOverlay(e.target.classList[0]));
+        createOverlay((loginSignUpDiv.contains(e.target)) ? e.target.id.slice(0, e.target.id.length - 3) : e.target.classList[0]);
     }
 }
 
@@ -257,18 +257,20 @@ function handleInput(letter) {
 
 // Creates the frag within the overlay
 function createOverlay(type) {
+    console.log("Creating overlay for: ", type);
     const frag = document.createDocumentFragment();
     if (type === "login" || type === "signup") {
-        const form = frag.appendChild(document.createElement("form"));
-        form.classList.add("loginsignupform");
+        const formContainer = frag.appendChild(document.createElement("div"));
+        const form = formContainer.appendChild(document.createElement("form"));
+        formContainer.classList.add("loginsignupform");
         form.id = `${type}-form`;
         const formInfo = (type === "login") ? loginForm : signUpForm;
         for (const elementTag in formInfo) {
             if (elementTag === "div") {
                 const div = form.appendChild(document.createElement(elementTag));
                 div.id = formInfo[elementTag].id;
-                for (const buttonAttr of formInfo[elementTag].button) {
-                    div.appendChild(Object.assign(document.createElement("button"), buttonAttr));
+                for (const pAttr of formInfo[elementTag].p) {
+                    div.appendChild(Object.assign(document.createElement("p"), pAttr));
                 }
             } else if (elementTag === "input") {
                 for (const inputAttr of formInfo[elementTag]) {
@@ -281,21 +283,25 @@ function createOverlay(type) {
     } else if (type === "win" || type === "lose") {
         const div = frag.appendChild(document.createElement("div"));
         div.id = "results";
-    }
-    overlayDiv.appendChild(frag);
-    if (type === "login" || type === "signup"){
-        overlayDiv.firstElementChild.addEventListener("submit", (type === "login") ? handleLogin : handleSignUp);
+    } else if (type === "settings") {
+
     }
     overlayDiv.style.display = "flex";
+    overlayDiv.appendChild(frag);
+    if (type === "login" || type === "signup"){
+        const form = document.getElementById(`${type}-form`);
+        form.parentElement.addEventListener("click", (e) => e.stopPropagation()); // Prevent clicks from reaching the overlayDiv
+        form.addEventListener("submit", (type === "login") ? handleLogin : handleSignUp);
+        form.querySelector(`span`).addEventListener("click", handleSpanClick);
+    }
 }
 
 function closeOverlay(e) {
     e.preventDefault();
-    if (!overlayDiv.firstElementChild.contains(e.target)) { // Clicked outside of the firstElementChild
+    if (e.target === e.currentTarget) { // Clicked outside of the overlay
         overlayDiv.style.display = "none";
         document.body.addEventListener("keydown", handleUserKeyboard);
     }
-    // Otherwise clicked inside firstElementChild
 }
 
 function emailExists(email) {
@@ -317,7 +323,7 @@ function handleSignUp(e) {
     const form = overlayDiv.querySelector("form");
     const email = form.elements["email"].value.toLowerCase();
     const password = form.elements["password"].value;
-    const passwordConfirm = form.elements["passwordConfirm"].value;
+    const passwordConfirm = form.elements["confirmPassword"].value;
 
     const emailErrors = validateEmail();
     const passwordErrors = validatePassword();
@@ -419,7 +425,7 @@ webKeyboard.addEventListener("mouseover", handleKeyHover);
 webKeyboard.addEventListener("mouseout", handleKeyHover);
 webKeyboard.addEventListener("click", handleWebKeyboard);
 
-document.body.addEventListener("click", handleSpanClick);
+loginSignUpDiv.addEventListener("click", handleSpanClick);
 document.body.addEventListener("mouseover", handleSpanHover);
 document.body.addEventListener("mouseout", handleSpanHover);
 

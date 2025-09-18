@@ -37,6 +37,16 @@ nav > h1 {
     cursor: pointer;
 }
 
+#resultsBtn {
+    width: 35px;
+    height: 35px;
+    background-image: url(./images/results-dark.png);
+    background-position: 25%;
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    margin-left: auto;
+}
+
 #settingsBtn {
     width: 35px;
     height: 35px;
@@ -45,7 +55,6 @@ nav > h1 {
     background-position: 50%;
     background-repeat: no-repeat;
     background-size: 90% auto;
-    margin-left: auto;
 }
 
 #instructionsBtn {
@@ -73,7 +82,7 @@ nav > h1 {
     background-size: 15% auto;
 }
 
-.nav-hover-effect {
+.span-hover-effect {
     cursor: pointer;
     text-decoration: underline;
     user-select: none;
@@ -189,7 +198,7 @@ nav > h1 {
     background-position: center;
 }
 
-/* Overlay for settings and login/signup */
+/* Overlay */
 #overlay {
     display: flex;
     justify-content: center;
@@ -200,15 +209,10 @@ nav > h1 {
     width: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 10;
-    /* display: none; */
+    display: none;
 }
 
-#settings {
-    background-color: #282828;
-    width: 600px;
-    height: 500px;
-}
-
+/* Form overlay (child of overlay) */
 .loginsignupform {
     position: relative;
     flex-wrap: wrap;
@@ -245,19 +249,19 @@ form > p {
 
 
 button.login, p.login {
-    background-color: rgb(22, 141, 221) !important;
+    background-color: rgb(22, 141, 221);
 }
 
 button.signup, p.signup {
-    background-color: rgb(197, 159, 52) !important;
+    background-color: rgb(197, 159, 52);
 }
 
 span.login {
-    color: rgb(22, 141, 221) !important;
+    color: rgb(22, 141, 221);
 }
 
 span.signup {
-    color: rgb(197, 159, 52) !important;
+    color: rgb(197, 159, 52);
 }
 
 #form-mode {
@@ -323,7 +327,9 @@ span.signup {
     display: none;
 }
 
+/* Results overlay (child of overlay) */
 #results {
+    position: relative;
     border-radius: 24px;
     text-align: center;
     background-color: #282828;
@@ -334,4 +340,39 @@ span.signup {
 #results > h1 {
     padding-bottom: 8px;
     border-bottom: 1px dotted #868686;
+}
+
+.pic {
+    height: 140px;
+    width: auto;
+}
+
+#message {
+    padding: 0 20px;
+    font-size: 18px;
+}
+
+#plugForAcc {
+    width: 240px;
+    position: absolute;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#formOptions {
+    position: absolute;
+    display: block;
+    margin: 10px 0 0 0;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 24px;
+    font-size: 22px;
+}
+
+/* Settings overlay (child of overlay) */
+#settings {
+    background-color: #282828;
+    width: 600px;
+    height: 500px;
 }

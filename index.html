@@ -11,6 +11,12 @@
             <h1>WORDLE</h1>
             <button
                 type="button"
+                value="results"
+                class="navElement"
+                id="resultsBtn"
+            ></button>
+            <button
+                type="button"
                 value="settings"
                 class="navElement"
                 id="settingsBtn"
@@ -24,9 +30,9 @@
                 ?
             </button>
             <div id="login-signup-div">
-                <span id="loginNav">Login</span>/<span id="signupNav"
-                    >Sign Up</span
-                >
+                <span id="loginNav">Login</span>
+                /
+                <span id="signupNav">Sign Up</span>
             </div>
         </nav>
         <div id="container">
@@ -180,17 +186,24 @@
                 </div>
             </main>
             <div id="overlay">
-                <div id="results">
+                <!-- <div id="results">
                     <h1>Results</h1>
-                    <p>Winning message.</p>
-                    <p>
-                        Want to view your past results? Login or sign up below!
-                    </p>
-                    <div id="form-mode">
-                        <button type="button" class="login">Login</button>
-                        <button type="button" class="signup">Sign Up</button>
+                    <img
+                        src="./images/congratulations.png"
+                        alt="Cute animal spreading confetti in celebration"
+                        class="pic"
+                    />
+                    <p id="message">Congratulations! You successfully guessed today's word!</p>
+                    <div id="stats">
+                        <p>It took you X guesses!</p>
+                        <p>Completed the game in 00:00</p>
                     </div>
-                </div>
+                    <p id="plugForAcc">Want to view your past results?</p>
+                    <p id="formOptions">
+                        <span class="login">Login</span> or
+                        <span class="signup">Sign Up</span>
+                    </p>
+                </div> -->
             </div>
         </div>
         <script src="./script.js"></script>

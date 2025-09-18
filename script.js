@@ -21,8 +21,7 @@ const signUpForm = {
     ],
     button: { type: "submit", textContent: "Sign Up", id: "submit", className: "signup" },
     p: { innerHTML: 'Already have an account? <span class="login">Login</span>' }
-    // p: { innerHTML: 'Already have an account?' }
-}
+};
 
 // Object containing information to create the login form
 const loginForm = {
@@ -39,13 +38,40 @@ const loginForm = {
     ],
     button: { type: "submit", textContent: "Login", id: "submit", className: "login" },
     p: { innerHTML: `Don't have an account? <span class="signup">Sign Up</span>` }
-    // p: { innerHTML: `Don't have an account?` }
-}
+};
 
-const wordList = ["audio", "range", "avert", "house", "latch", "itchy", "sully"]
+const resultsForm = {
+    h1: { textContent: "Results" },
+    mainText: {
+        textContent: {
+            win: "Congratulations! You successfully guessed today's word!",
+            lose: "Unfortunately, you ran out of guesses..."
+        }
+    },
+    img: {
+        win: {
+            src: "./images/congratulations.png",
+            alt: "Cute animal spreading confetti in celebration",
+            className: "pic"
+        },
+        lose: {
+            src: "./images/sad-depression.png",
+            alt: "Cute animal brooding",
+            className: "pic"
+        }
+    },
+    div: { id: "stats" },
+    p: [
+        { id: "plugForAcc", textContent: "Want to view your past results?" },
+        { id: "formOptions", innerHTML: '<span class="login">Login</span> or <span class="signup">Sign Up</span>' }
+    ]
+};
+
+const wordList = ["audio", "range", "avert", "house", "latch", "itchy", "sully, trust"]
 // const answer = wordList[Math.floor(Math.random() * wordList.length)];
 const answer = "trust";
 // console.log(answer);
+const start = Date.now();
 const maxGuesses = 6;
 const pastGuesses = [];
 const keyboardColors = {}; // Used to color letters green or gray (exists/does not exist)
@@ -62,8 +88,8 @@ const overlayDiv = document.getElementById("overlay");
 function handleSpanHover(e) {
     e.preventDefault();
     if (e.target.localName === "span") {
-        e.target.classList.toggle("nav-hover-effect");
-        if (e.target.parentElement.localName != "p") {
+        e.target.classList.toggle("span-hover-effect");
+        if (loginSignUpDiv.contains(e.target)) {
             e.target.classList.toggle(((e.target.textContent.toLowerCase()).includes("sign") ? "signup" : "login"));
         }
     }
@@ -73,12 +99,15 @@ function handleSpanHover(e) {
 function handleSpanClick(e) {
     e.preventDefault();
     if (e.target.localName === "span") {
+        console.log("Clicked span");
         if (overlayDiv.style.display === "none") {
             overlayDiv.style.display = "flex";
             document.body.removeEventListener("keydown", handleUserKeyboard);
         }
-        overlayDiv.removeChild(overlayDiv.firstElementChild);
-        createOverlay((loginSignUpDiv.contains(e.target)) ? e.target.id.slice(0, e.target.id.length - 3) : e.target.classList[0]);
+        if (overlayDiv.firstElementChild) {
+            overlayDiv.removeChild(overlayDiv.firstElementChild);
+        }
+        createOverlay("form", (loginSignUpDiv.contains(e.target)) ? e.target.id.slice(0, e.target.id.length - 3) : e.target.classList[0]);
     }
 }
 
@@ -116,15 +145,15 @@ function handleInput(letter) {
     } else if (letter === "enter") { // Handle complete guesses
         const userGuess = getGuess();
         if (userGuess.length < 5) { // Guess is too short
-
-        } else if(pastGuesses.includes(userGuess)) { // Repeated guess
-
-        }else if (userGuess === answer) { // Correct answer
+            console.log("User guess is too short.");
+        } else if (pastGuesses.includes(userGuess)) { // Repeated guess
+            console.log("User guess is the same as a past guess.");
+        } else if (userGuess === answer) { // Correct answer
             checkValidPositions(userGuess);
             displayGuessColors(); // Update guess to show colors
             displayKeyboardColors(); // Update colors on web keyboard
             endGame();
-            createOverlay("win");
+            createOverlay("results", "win");
         } else {
             // Find any letters in the user's guess that is in the correct position
             checkValidPositions(userGuess);
@@ -141,7 +170,7 @@ function handleInput(letter) {
             pastGuesses.push(userGuess);
             if (guessPos >= maxGuesses) {
                 endGame();
-                createOverlay("lose");
+                createOverlay("results", "lose");
             }
         }
     } else if (letter === "backspace") {
@@ -168,7 +197,7 @@ function handleInput(letter) {
 
     // Updates colors of the web keyboard's keys based on valid, existing, and nonexisting letters
     function displayKeyboardColors() {
-        for(const letter in keyboardColors){
+        for (const letter in keyboardColors) {
             // Use keyDict to set the key at that specific row and col to correct color
             webKeyboard.children[keyDict[letter].row].children[keyDict[letter].col].style.backgroundColor = colorDict[keyboardColors[letter]];
         }
@@ -216,11 +245,7 @@ function handleInput(letter) {
     function letterCounter(word) {
         const counter = {};
         for (const letter of word) {
-            if (counter[letter]) {
-                counter[letter]++;
-            } else {
-                counter[letter] = 1;
-            }
+            counter[letter] = (counter[letter] || 0) + 1;
         }
         return counter;
     }
@@ -249,17 +274,19 @@ function handleInput(letter) {
                 }
             } else {
                 guessColors[i] = "nonexistent";
-                keyboardColors[guess[i]] = "nonexistent";
+                if (keyboardColors[guess[i]] != "valid") {
+                    keyboardColors[guess[i]] = "nonexistent";
+                }
             }
         }
     }
 }
 
 // Creates the frag within the overlay
-function createOverlay(type) {
+function createOverlay(category, type) {
     console.log("Creating overlay for: ", type);
     const frag = document.createDocumentFragment();
-    if (type === "login" || type === "signup") {
+    if (category === "form") {
         const formContainer = frag.appendChild(document.createElement("div"));
         const form = formContainer.appendChild(document.createElement("form"));
         formContainer.classList.add("loginsignupform");
@@ -280,19 +307,105 @@ function createOverlay(type) {
                 form.appendChild(Object.assign(document.createElement(elementTag), formInfo[elementTag]));
             }
         }
-    } else if (type === "win" || type === "lose") {
-        const div = frag.appendChild(document.createElement("div"));
-        div.id = "results";
+    } else if (category === "results" && type) {
+        const divContainer = frag.appendChild(document.createElement("div"));
+        divContainer.id = category;
+        for (const elementTag in resultsForm) {
+            if (elementTag === "div") { // Handle stats
+                const div = divContainer.appendChild(document.createElement(elementTag));
+                div.id = resultsForm[elementTag].id;
+                const stat1 = div.appendChild(document.createElement("p"));
+                const stat2 = div.appendChild(document.createElement("p"));
+                stat1.textContent = (type === "win") ? `It took you ${guessPos + 1} ${(guessPos + 1 === 1) ? "try" : "tries"} to guess today's word.` : countExistsAndValids();
+                stat2.textContent = `${(type === "win") ? "Completed" : "Played"} the game ${(type === "win") ? "in" : "for"} ${timeElapsed()}`;
+            } else if (elementTag === "img") {
+                const img = divContainer.appendChild(Object.assign(document.createElement(elementTag), resultsForm[elementTag][type]));
+                divContainer.addEventListener("mouseover", handleImgHover);
+                divContainer.addEventListener("mouseout", handleImgHover);
+            } else if (elementTag === "p") {
+                for (const pAttr of resultsForm[elementTag]) {
+                    divContainer.appendChild(Object.assign(document.createElement(elementTag), pAttr));
+                }
+            } else if (elementTag === "mainText") {
+                const mainText = divContainer.appendChild(document.createElement("p"));
+                mainText.id = "message";
+                mainText.textContent = resultsForm[elementTag].textContent[type];
+            } else { // h1
+                divContainer.appendChild(Object.assign(document.createElement(elementTag), resultsForm[elementTag]));
+            }
+        }
+
+        // Issue where mouse movement in the div causes the event to trigger
+        function handleImgHover(e) {
+            e.stopPropagation();
+            if (divContainer.contains(e.target)) {
+                const img = document.getElementsByClassName("pic")[0];
+                const imgType = img.src.slice(-3);
+                if (imgType == "png") {
+                    img.src = img.src.slice(0, -3) + "gif";
+                } else {
+                    img.src = img.src.slice(0, -3) + "png";
+                }
+            }
+        }
+
+        function timeElapsed() {
+            const totalSeconds = Math.floor((Date.now - start) / 1000);
+            const secondsPassed = totalSeconds % 60;
+            const minutesPassed = (totalSeconds - secondsPassed) / 60;
+            if (minutesPassed > 0) {
+                if (secondsPassed > 0) { // Minutes and seconds
+                    return `${minutesPassed} minute${(minutesPassed === 1) ? "" : "s"} and ${secondsPassed} second${(secondsPassed === 1) ? "" : "s"}.`;
+                } else { // No seconds, but there are minutes
+                    return `${minutesPassed} minute${(minutesPassed === 1) ? "" : "s"}.`;
+                }
+            }
+            else if (secondsPassed > 0) { // No minutes, but there seconds
+                return `${secondsPassed} second${(secondsPassed === 1) ? "" : "s"}.`;
+            } else {
+                return "0 seconds!?";
+            }
+        }
+
+        function countExistsAndValids() {
+            let validCount = 0;
+            let existCount = 0;
+            for (const letter in keyboardColors) {
+                if (keyboardColors[letter] === "valid") {
+                    validCount++;
+                } else if (keyboardColors[letter] === "exists") {
+                    existCount++;
+                }
+            }
+            if (validCount > 0) {
+                if (existCount > 0) { // User found at least one letter in the correct position and at least one letter that is in the word, but not in the correct position.
+                    return `You found ${validCount} letter${(validCount === 1) ? "" : "s"} in the correct position and ${existCount} letter${(existCount === 1) ? "" : "s"} that exist in the word.`;
+                } else { // User only found at least one letter in the correct position.
+                    return `You found ${validCount} letter${(validCount === 1) ? "" : "s"} in the correct position.`;
+                }
+            }
+            else if (existCount > 0) { // User only found at least one letter that is in the word, but not in the correct position.
+                return `You found ${existCount} letter${(existCount === 1) ? "" : "s"} that exist in the word.`;
+            } else { // User did not find any letters in the correct position or letters that exist in the answer, but are in the wrong position.
+                return "None of your guesses were close to today's word. Better luck next time!";
+            }
+        }
     } else if (type === "settings") {
 
     }
     overlayDiv.style.display = "flex";
     overlayDiv.appendChild(frag);
-    if (type === "login" || type === "signup"){
-        const form = document.getElementById(`${type}-form`);
-        form.parentElement.addEventListener("click", (e) => e.stopPropagation()); // Prevent clicks from reaching the overlayDiv
+    const divContainer = overlayDiv.firstElementChild;
+    divContainer.addEventListener("mouseover", handleSpanHover);
+    divContainer.addEventListener("mouseout", handleSpanHover);
+    divContainer.addEventListener("click", (e) => e.stopPropagation()); // Prevent clicks from reaching the overlayDiv
+    if (category === "form") {
+        const form = divContainer.querySelector("form");
         form.addEventListener("submit", (type === "login") ? handleLogin : handleSignUp);
-        form.querySelector(`span`).addEventListener("click", handleSpanClick);
+        form.querySelector("span").addEventListener("click", handleSpanClick);
+    } else if (category === "results") {
+        const formOptions = divContainer.querySelector("#formOptions");
+        formOptions.querySelector("span").addEventListener("click", handleSpanClick);
     }
 }
 
@@ -306,9 +419,9 @@ function closeOverlay(e) {
 
 function emailExists(email) {
     const userObjects = JSON.parse(localStorage.getItem("users")); // Retrieve array of user objects
-    if (userObjects.length > 0){
-        for (const user of userObjects){
-            if (user.email === email){
+    if (userObjects.length > 0) {
+        for (const user of userObjects) {
+            if (user.email === email) {
                 return true;
             }
         }
@@ -328,7 +441,7 @@ function handleSignUp(e) {
     const emailErrors = validateEmail();
     const passwordErrors = validatePassword();
 
-    if (!(emailErrors || passwordErrors)){
+    if (!(emailErrors || passwordErrors)) {
         console.log("No signup errors!");
         // Create the user object for local storage.
         const userObject = {
@@ -342,20 +455,20 @@ function handleSignUp(e) {
     function checkUpperLower(word) {
         let countLower = 0;
         let countUpper = 0;
-        for (const ch in word){
-            if (ch >= "a" && ch <= "z"){
+        for (const ch in word) {
+            if (ch >= "a" && ch <= "z") {
                 countLower++;
-            } else if (ch >= "A" && ch <= "Z"){
+            } else if (ch >= "A" && ch <= "Z") {
                 countUpper++;
             }
-            if (countLower > 0 && countUpper > 0){
+            if (countLower > 0 && countUpper > 0) {
                 return true;
             }
         }
         return false;
     }
-    
-    function validateEmail(){
+
+    function validateEmail() {
         if (!email) {
             return "The email cannot be blank.";
         } else if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
@@ -366,15 +479,15 @@ function handleSignUp(e) {
     }
 
     function validatePassword() {
-        if (!password){
+        if (!password) {
             return "Passwords must be at least 10 characters long.";
         } else if (!password.match(/\W/)) {
             return "Passwords must contain at least one special character.";
         } else if (password.toLowerCase().match(/password/)) {
             return 'Passwords cannot contain the word "password" (uppercase, lowercase, or mixed).';
-        } else if (checkUpperLower(password)){
+        } else if (checkUpperLower(password)) {
             return "Password must contain at least one uppercase and lowercase character."
-        }else if (password != passwordConfirm){
+        } else if (password != passwordConfirm) {
             return "Both password must match.";
         }
     }
@@ -388,21 +501,21 @@ function handleLogin(e) {
     const password = form.elements["password"].value;
 
     // Handle login form
-    if (form.children[0].textContent === "Login"){
-        
+    if (form.children[0].textContent === "Login") {
+
 
     } else { // Handle sign up form
 
-        
+
     }
 
     function validatePassword() {
-        if (!password){
+        if (!password) {
 
         }
     }
 
-    function validateEmail(){
+    function validateEmail() {
         if (!email) {
             return "The email cannot be blank.";
         } else if (!emailExists(email)) {
@@ -426,13 +539,13 @@ webKeyboard.addEventListener("mouseout", handleKeyHover);
 webKeyboard.addEventListener("click", handleWebKeyboard);
 
 loginSignUpDiv.addEventListener("click", handleSpanClick);
-document.body.addEventListener("mouseover", handleSpanHover);
-document.body.addEventListener("mouseout", handleSpanHover);
+loginSignUpDiv.addEventListener("mouseover", handleSpanHover);
+loginSignUpDiv.addEventListener("mouseout", handleSpanHover);
 
 document.body.addEventListener("keydown", handleUserKeyboard);
 overlayDiv.addEventListener("click", closeOverlay);
 
-if (!localStorage.getItem("users")){
+if (!localStorage.getItem("users")) {
     localStorage.setItem("users", JSON.stringify([]));
 }
 console.log(localStorage);

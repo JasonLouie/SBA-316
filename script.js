@@ -84,6 +84,7 @@ const webKeyboard = document.getElementById("keyboard");
 const loginSignUpDiv = document.getElementById("login-signup-div");
 const overlayDiv = document.getElementById("overlay");
 const resultsBtn = document.getElementById("resultsBtn");
+const gameContainer = document.getElementById("wordle");
 
 // Handles hovering over spans (expected to be login/sign up text)
 function handleSpanHover(e) {
@@ -146,9 +147,9 @@ function handleInput(letter) {
     } else if (letter === "enter") { // Handle complete guesses
         const userGuess = getGuess();
         if (userGuess.length < 5) { // Guess is too short
-            showError("Your guess must contain five letters.");
+            createError("Your guess must contain five letters.");
         } else if (pastGuesses.includes(userGuess)) { // Repeated guess
-            showError("Your guess cannot be a repeated guess.");
+            createError("Your guess cannot be a repeated guess.");
         } else if (userGuess === answer) { // Correct answer
             pastGuesses.push(userGuess);
             checkValidPositions(userGuess);
@@ -180,14 +181,17 @@ function handleInput(letter) {
     }
 
     // Shows error to the user
-    function showError(errorMsg) {
-        const errorDiv = document.getElementById("alert");
-        errorDiv.style.display = "block";
-        errorDiv.firstElementChild.textContent = errorMsg;
+    function createError(errorMsg) {
+        const errorDiv = document.createElement("div");
+        errorDiv.id = "alert";
+        const errorP = document.createElement("p");
+        errorP.textContent = errorMsg;
+        errorP.id = "alertText";
+        errorDiv.appendChild(errorP);
+        gameContainer.appendChild(errorDiv);
         setTimeout(() => {
-            errorDiv.style.display = "none";
-            errorDiv.firstElementChild.textContent = "";
-        }, 2000)
+            gameContainer.removeChild(errorDiv);
+        }, 3000)
     }
 
     // Handles showing user's results only after the game ends
@@ -428,7 +432,7 @@ function closeOverlay(e) {
         if (overlayDiv.firstElementChild){
             overlayDiv.removeChild(overlayDiv.firstElementChild);
         }
-        if (timeElapsed === ""){ // Only reactivate this event listener if game isn't done. This variable is non-empty when the game ends.
+        if (timeTaken === ""){ // Only reactivate this event listener if game isn't done. This variable is non-empty when the game ends.
             document.body.addEventListener("keydown", handleUserKeyboard);
         }
     }

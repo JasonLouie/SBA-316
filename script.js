@@ -285,15 +285,15 @@ function handleInput(letter) {
         for (let i = 0; i < guess.length; i++) {
             if (guessColors[i] === "valid") {
                 continue;
-            } else if (answer.includes(guess[i]) && ansLetters[guess[i]] > 0) {
+            } else if (answer.includes(guess[i]) && ansLetters[guess[i]] > 0) { // Current letter is in the answer, but in the wrong position
                 ansLetters[guess[i]]--;
                 guessColors[i] = "exists";
-                if (keyboardColors[guess[i]] != "valid") {
+                if (keyboardColors[guess[i]] != "valid") { // Do not overwrite keys that are valid in the global object
                     keyboardColors[guess[i]] = "exists";
                 }
-            } else {
+            } else { // Current letter is not in the answer
                 guessColors[i] = "nonexistent";
-                if (keyboardColors[guess[i]] != "valid" && keyboardColors[guess[i]] != "exists") {
+                if (keyboardColors[guess[i]] != "valid" && keyboardColors[guess[i]] != "exists") { // Do not overwrite keys that are valid or exist in the global object.
                     keyboardColors[guess[i]] = "nonexistent";
                 }
             }
@@ -421,9 +421,11 @@ function createOverlay(category, type) {
 // Handles closing the overlay and returning back to the game
 function closeOverlay(e) {
     e.preventDefault();
-    if (e.target === e.currentTarget) { // Clicked outside of the overlay
+    if (e.target === e.currentTarget) { // Clicked outside of the overlay's children elements
         overlayDiv.style.display = "none";
-        overlayDiv.removeChild(overlayDiv.firstElementChild);
+        if (overlayDiv.firstElementChild){
+            overlayDiv.removeChild(overlayDiv.firstElementChild);
+        }
         if (timeElapsed === ""){ // Only reactivate this event listener if game isn't done. This variable is non-empty when the game ends.
             document.body.addEventListener("keydown", handleUserKeyboard);
         }

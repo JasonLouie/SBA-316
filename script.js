@@ -70,7 +70,6 @@ const resultsForm = {
 const wordList = ["audio", "range", "avert", "house", "latch", "itchy", "sully", "trust"];
 // const validGuesses = []; // To be implemented. Need to use an API to fetch lots of words.
 const answer = wordList[Math.floor(Math.random() * wordList.length)];
-// console.log("Answer:", answer);
 const start = Date.now();
 const maxGuesses = 6;
 const pastGuesses = [];
@@ -101,7 +100,6 @@ function handleSpanHover(e) {
 function handleSpanClick(e) {
     e.preventDefault();
     if (e.target.localName === "span") {
-        console.log("Clicked span");
         document.body.removeEventListener("keydown", handleUserKeyboard);
         if (overlayDiv.style.display === "none") {
             overlayDiv.style.display = "flex";
@@ -133,6 +131,7 @@ function handleWebKeyboard(e) {
 function handleUserKeyboard(e) {
     e.preventDefault();
     if (e instanceof KeyboardEvent && !e.repeat) {
+        const keyValue = e.key.toLowerCase();
         handleInput(e.key.toLowerCase());
     }
 }
@@ -142,7 +141,7 @@ function handleInput(letter) {
     const guessColors = {}; // Local letter colors
     const ansLetters = letterCounter(answer);
     const colorDict = { valid: "var(--green-bg)", exists: "var(--yellow-bg)", nonexistent: "var(--gray-bg)" };
-    if (letter.length === 1 && (letterPos >= 0 && letterPos < 5)) { // Handle letters
+    if (letter.length === 1 && (letterPos >= 0 && letterPos < 5) && (letter >= "a" && letter <= "z")) { // Handle letters
         addLetter(letter);
     } else if (letter === "enter") { // Handle complete guesses
         const userGuess = getGuess();
@@ -251,7 +250,6 @@ function handleInput(letter) {
 
     // Removes letters from answer based on the correct indexes the user guessed
     function filterAnswer() {
-        console.log("Filtering answer...")
         let filteredAnswer = "";
         for (let i = 0; i < answer.length; i++) {
             if (guessColors[i] === "valid") {
@@ -260,7 +258,6 @@ function handleInput(letter) {
                 filteredAnswer += answer[i];
             }
         }
-        console.log(`Filtered answer is ${filteredAnswer}`);
         return filteredAnswer;
     }
 
@@ -285,7 +282,6 @@ function handleInput(letter) {
 
     // Check if letters not set as valid from the user's guess are included in the remaining letters of the answer. Updates the global object for showing web keyboard colors and the local object (object in this instance) for the current user's guess.
     function checkExistsNotExists(guess, answer) {
-        console.log(`Comparing ${guess} to ${answer}`);
         for (let i = 0; i < guess.length; i++) {
             if (guessColors[i] === "valid") {
                 continue;
@@ -467,7 +463,6 @@ function handleImgHover(e) {
 // Handles form validation for user sign up
 function handleSignUp(e) {
     e.preventDefault(); // Prevent form from reloading page
-    console.log("Sign up validation");
     const form = overlayDiv.querySelector("form");
     const email = form.elements["email"].value.toLowerCase();
     const password = form.elements["password"].value;
@@ -492,13 +487,11 @@ function handleSignUp(e) {
         localStorage.setItem("users", JSON.stringify(userStorage));
         alert("Sign up was successful!");
     } else { // Validation failed, so form should not be submitted.
-        console.log("Sign up errors!")
         emailErrorDisplay.textContent = (emailErrors) ? emailErrors : ""; // Show an error if it exists, otherwise don't.
         passwordErrorDisplay.textContent = (passwordErrors) ? passwordErrors : ""; // Show an error if it exists, otherwise don't.
     }
 
     function validateEmail() {
-        console.log("Email exists? ", emailExists(email))
         if (!email) {
             return "Email cannot be blank.";
         } else if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
@@ -528,7 +521,6 @@ function handleSignUp(e) {
 // Handles form validation for user login
 function handleLogin(e) {
     e.preventDefault(); // Prevent form from reloading page
-    console.log("Login validation");
     const form = overlayDiv.querySelector("form");
     const email = form.elements["email"].value.toLowerCase();
     const password = form.elements["password"].value;
@@ -539,13 +531,11 @@ function handleLogin(e) {
     const passwordErrors = validatePassword();
 
     if (!(emailErrors && passwordErrors)) {
-        console.log("Login success!");
         emailErrorDisplay.textContent = ""; // Reset email error to have no text content.
         passwordErrorDisplay.textContent = ""; // Reset password error to have no text content.
         form.reset();
         alert("Login was successful!");
     } else {
-        console.log("Login error!");
         emailErrorDisplay.textContent = (emailErrors) ? emailErrors : ""; // Show an error if it exists, otherwise don't.
         passwordErrorDisplay.textContent = (passwordErrors) ? passwordErrors : ""; // Show an error if it exists, otherwise don't.
     }

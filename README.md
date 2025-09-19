@@ -1,1 +1,2 @@
 # SBA-316
+For this SBA, a clone of the popular game wordle was created. The UI mostly resembles the original WORDLE game, but there are a few differences. Keyboard is more responsive (hovering over each key darkens the key), different login/signup overlay, results overlay displaying a gif and time elapsed.

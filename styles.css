@@ -403,6 +403,17 @@ form#login-form #text-recommend {
     font-size: 18px;
 }
 
+#stats p {
+    left: 50%;
+    transform: translateX(-50%);
+    position: absolute;
+    width: 300px;
+}
+
+#stats p:last-child {
+    bottom: 100px;
+}
+
 #plugForAcc {
     width: 240px;
     position: absolute;

@@ -42,7 +42,7 @@ const loginForm = {
 
 const resultsForm = {
     h1: { textContent: "Results" },
-    mainText: {
+    mainText: { // paragraph element
         textContent: {
             win: "Congratulations! You successfully guessed today's word!",
             lose: "Unfortunately, you ran out of guesses..."
@@ -407,7 +407,9 @@ function createOverlay(category, type) {
                 return "None of your guesses were close to today's word. Better luck next time!";
             }
         }
-    } else if (type === "settings") {
+    } else if (category === "settings") {
+
+    } else if (category === "instructions") {
 
     }
     overlayDiv.style.display = "flex";

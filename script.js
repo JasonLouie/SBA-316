@@ -20,7 +20,7 @@ const signUpForm = {
         { type: "password", name: "confirmPassword", placeholder: "Confirm password", className: "field" }
     ],
     button: { type: "submit", textContent: "Sign Up", id: "submit", className: "signup" },
-    p: { innerHTML: 'Already have an account? <span class="login">Login</span>' }
+    p: { id: "text-recommend", innerHTML: 'Already have an account? <span class="login">Login</span>' }
 };
 
 // Object containing information to create the login form
@@ -37,7 +37,7 @@ const loginForm = {
         { type: "password", name: "password", placeholder: "Password", className: "field", autocomplete: "current-password" },
     ],
     button: { type: "submit", textContent: "Login", id: "submit", className: "login" },
-    p: { innerHTML: `Don't have an account? <span class="signup">Sign Up</span>` }
+    p: { id: "text-recommend", innerHTML: `Don't have an account? <span class="signup">Sign Up</span>` }
 };
 
 const resultsForm = {
@@ -67,29 +67,31 @@ const resultsForm = {
     ]
 };
 
-const wordList = ["audio", "range", "avert", "house", "latch", "itchy", "sully, trust"]
-// const answer = wordList[Math.floor(Math.random() * wordList.length)];
-const answer = "trust";
-// console.log(answer);
+const wordList = ["audio", "range", "avert", "house", "latch", "itchy", "sully", "trust"];
+// const validGuesses = []; // To be implemented. Need to use an API to fetch lots of words.
+const answer = wordList[Math.floor(Math.random() * wordList.length)];
+// console.log("Answer:", answer);
 const start = Date.now();
 const maxGuesses = 6;
 const pastGuesses = [];
 const keyboardColors = {}; // Used to color letters green or gray (exists/does not exist)
 
 let guessPos = 0; // Index of the guess (row of the guess)
-let letterPos = 0; // Index of the letter of the current guess
+let letterPos = 0; // Index of the letter of the current guess (column of the guess)
+let timeTaken = ""; // Used later on to revisit results
 
 const guesses = document.getElementById("guesses");
 const webKeyboard = document.getElementById("keyboard");
 const loginSignUpDiv = document.getElementById("login-signup-div");
 const overlayDiv = document.getElementById("overlay");
+const resultsBtn = document.getElementById("resultsBtn");
 
 // Handles hovering over spans (expected to be login/sign up text)
 function handleSpanHover(e) {
     e.preventDefault();
     if (e.target.localName === "span") {
         e.target.classList.toggle("span-hover-effect");
-        if (loginSignUpDiv.contains(e.target)) {
+        if (loginSignUpDiv.contains(e.target)) { // Only do this for navbar login sign up spans
             e.target.classList.toggle(((e.target.textContent.toLowerCase()).includes("sign") ? "signup" : "login"));
         }
     }
@@ -100,9 +102,9 @@ function handleSpanClick(e) {
     e.preventDefault();
     if (e.target.localName === "span") {
         console.log("Clicked span");
+        document.body.removeEventListener("keydown", handleUserKeyboard);
         if (overlayDiv.style.display === "none") {
             overlayDiv.style.display = "flex";
-            document.body.removeEventListener("keydown", handleUserKeyboard);
         }
         if (overlayDiv.firstElementChild) {
             overlayDiv.removeChild(overlayDiv.firstElementChild);
@@ -145,10 +147,11 @@ function handleInput(letter) {
     } else if (letter === "enter") { // Handle complete guesses
         const userGuess = getGuess();
         if (userGuess.length < 5) { // Guess is too short
-            console.log("User guess is too short.");
+            showError("Your guess must contain five letters.");
         } else if (pastGuesses.includes(userGuess)) { // Repeated guess
-            console.log("User guess is the same as a past guess.");
+            showError("Your guess cannot be a repeated guess.");
         } else if (userGuess === answer) { // Correct answer
+            pastGuesses.push(userGuess);
             checkValidPositions(userGuess);
             displayGuessColors(); // Update guess to show colors
             displayKeyboardColors(); // Update colors on web keyboard
@@ -165,16 +168,34 @@ function handleInput(letter) {
             checkExistsNotExists(userGuess, filteredAnswer);
             displayGuessColors(); // Update guess to show colors
             displayKeyboardColors(); // Update colors on web keyboard
-            letterPos = 0;
-            guessPos++;
-            pastGuesses.push(userGuess);
-            if (guessPos >= maxGuesses) {
+            letterPos = 0; // Reset position for typing
+            guessPos++; // Move onto the next row
+            pastGuesses.push(userGuess); // Add user's guess to the pastGuesses
+            if (guessPos >= maxGuesses) { // Check if game should end
                 endGame();
                 createOverlay("results", "lose");
             }
         }
     } else if (letter === "backspace") {
         removeLetter();
+    }
+
+    // Shows error to the user
+    function showError(errorMsg) {
+        const errorDiv = document.getElementById("alert");
+        errorDiv.style.display = "block";
+        errorDiv.firstElementChild.textContent = errorMsg;
+        setTimeout(() => {
+            errorDiv.style.display = "none";
+            errorDiv.firstElementChild.textContent = "";
+        }, 2000)
+    }
+
+    // Handles showing user's results only after the game ends
+    function handleOpenResults(e) {
+        if (e.target === e.currentTarget) {
+            createOverlay("results", `${(pastGuesses.includes(answer)) ? "win" : "lose"}`)
+        }
     }
 
     // Ends the game
@@ -184,6 +205,8 @@ function handleInput(letter) {
         webKeyboard.removeEventListener("mouseover", handleKeyHover);
         webKeyboard.removeEventListener("mouseout", handleKeyHover);
         webKeyboard.removeEventListener("click", handleWebKeyboard);
+        resultsBtn.addEventListener("click", handleOpenResults); // Allow user to view today's results
+        resultsBtn.style.visibility = "visible";
         overlayDiv.style.display = "flex";
     }
 
@@ -274,7 +297,7 @@ function handleInput(letter) {
                 }
             } else {
                 guessColors[i] = "nonexistent";
-                if (keyboardColors[guess[i]] != "valid") {
+                if (keyboardColors[guess[i]] != "valid" && keyboardColors[guess[i]] != "exists") {
                     keyboardColors[guess[i]] = "nonexistent";
                 }
             }
@@ -284,13 +307,16 @@ function handleInput(letter) {
 
 // Creates the frag within the overlay
 function createOverlay(category, type) {
-    console.log("Creating overlay for: ", type);
     const frag = document.createDocumentFragment();
-    if (category === "form") {
+    if (category === "form" && type) {
+        overlayDiv.removeEventListener("mouseover", handleImgHover);
+        overlayDiv.removeEventListener("mouseout", handleImgHover);
         const formContainer = frag.appendChild(document.createElement("div"));
         const form = formContainer.appendChild(document.createElement("form"));
+        form.addEventListener("submit", (type === "login") ? handleLogin : handleSignUp);
         formContainer.classList.add("loginsignupform");
         form.id = `${type}-form`;
+        form.noValidate = true;
         const formInfo = (type === "login") ? loginForm : signUpForm;
         for (const elementTag in formInfo) {
             if (elementTag === "div") {
@@ -302,12 +328,20 @@ function createOverlay(category, type) {
             } else if (elementTag === "input") {
                 for (const inputAttr of formInfo[elementTag]) {
                     form.appendChild(Object.assign(document.createElement(elementTag), inputAttr));
+                    if (inputAttr.name != "confirmPassword") {
+                        const errorMsg = form.appendChild(document.createElement("p"));
+                        errorMsg.id = `${inputAttr.name}Error`;
+                        errorMsg.classList.add("form-error");
+                    }
                 }
             } else { // h1, p, and submit button
                 form.appendChild(Object.assign(document.createElement(elementTag), formInfo[elementTag]));
             }
         }
+        form.querySelector("span").addEventListener("click", handleSpanClick);
     } else if (category === "results" && type) {
+        overlayDiv.addEventListener("mouseover", handleImgHover);
+        overlayDiv.addEventListener("mouseout", handleImgHover);
         const divContainer = frag.appendChild(document.createElement("div"));
         divContainer.id = category;
         for (const elementTag in resultsForm) {
@@ -316,12 +350,11 @@ function createOverlay(category, type) {
                 div.id = resultsForm[elementTag].id;
                 const stat1 = div.appendChild(document.createElement("p"));
                 const stat2 = div.appendChild(document.createElement("p"));
+                timeTaken = (timeTaken) ? timeTaken : timeElapsed();
                 stat1.textContent = (type === "win") ? `It took you ${guessPos + 1} ${(guessPos + 1 === 1) ? "try" : "tries"} to guess today's word.` : countExistsAndValids();
-                stat2.textContent = `${(type === "win") ? "Completed" : "Played"} the game ${(type === "win") ? "in" : "for"} ${timeElapsed()}`;
+                stat2.textContent = `You ${(type === "win") ? "completed" : "played"} the game ${(type === "win") ? "in" : "for"} ${timeTaken}`;
             } else if (elementTag === "img") {
                 const img = divContainer.appendChild(Object.assign(document.createElement(elementTag), resultsForm[elementTag][type]));
-                divContainer.addEventListener("mouseover", handleImgHover);
-                divContainer.addEventListener("mouseout", handleImgHover);
             } else if (elementTag === "p") {
                 for (const pAttr of resultsForm[elementTag]) {
                     divContainer.appendChild(Object.assign(document.createElement(elementTag), pAttr));
@@ -334,23 +367,11 @@ function createOverlay(category, type) {
                 divContainer.appendChild(Object.assign(document.createElement(elementTag), resultsForm[elementTag]));
             }
         }
-
-        // Issue where mouse movement in the div causes the event to trigger
-        function handleImgHover(e) {
-            e.stopPropagation();
-            if (divContainer.contains(e.target)) {
-                const img = document.getElementsByClassName("pic")[0];
-                const imgType = img.src.slice(-3);
-                if (imgType == "png") {
-                    img.src = img.src.slice(0, -3) + "gif";
-                } else {
-                    img.src = img.src.slice(0, -3) + "png";
-                }
-            }
-        }
+        const formOptions = divContainer.querySelector("#formOptions");
+        formOptions.addEventListener("click", handleSpanClick);
 
         function timeElapsed() {
-            const totalSeconds = Math.floor((Date.now - start) / 1000);
+            const totalSeconds = Math.floor((Date.now() - start) / 1000);
             const secondsPassed = totalSeconds % 60;
             const minutesPassed = (totalSeconds - secondsPassed) / 60;
             if (minutesPassed > 0) {
@@ -399,24 +420,19 @@ function createOverlay(category, type) {
     divContainer.addEventListener("mouseover", handleSpanHover);
     divContainer.addEventListener("mouseout", handleSpanHover);
     divContainer.addEventListener("click", (e) => e.stopPropagation()); // Prevent clicks from reaching the overlayDiv
-    if (category === "form") {
-        const form = divContainer.querySelector("form");
-        form.addEventListener("submit", (type === "login") ? handleLogin : handleSignUp);
-        form.querySelector("span").addEventListener("click", handleSpanClick);
-    } else if (category === "results") {
-        const formOptions = divContainer.querySelector("#formOptions");
-        formOptions.querySelector("span").addEventListener("click", handleSpanClick);
-    }
 }
 
+// Handles closing the overlay and returning back to the game
 function closeOverlay(e) {
     e.preventDefault();
     if (e.target === e.currentTarget) { // Clicked outside of the overlay
         overlayDiv.style.display = "none";
+        overlayDiv.removeChild(overlayDiv.firstElementChild);
         document.body.addEventListener("keydown", handleUserKeyboard);
     }
 }
 
+// Checks if email exists in localStorage
 function emailExists(email) {
     const userObjects = JSON.parse(localStorage.getItem("users")); // Retrieve array of user objects
     if (userObjects.length > 0) {
@@ -429,123 +445,164 @@ function emailExists(email) {
     return false;
 }
 
+// Handles switching from png to gif for results pic. When cursor is in the overlayDiv only, pause. If the cursor is anywhere inside the child element, animate (turn it back into a gif).
+function handleImgHover(e) {
+    if (overlayDiv.style.display === "flex") { // Only do this if the overlay div is not hidden
+        if (e.target != e.currentTarget) { // In the overlay div's child element, so make the img a gif.
+            const img = document.getElementsByClassName("pic")[0];
+            const imgType = img.src.slice(-3);
+            if (imgType == "png") {
+                img.src = img.src.slice(0, -3) + "gif";
+            }
+        } else { // Make the img back to a png (cursor is in the overlay div)
+            const img = document.getElementsByClassName("pic")[0];
+            const imgType = img.src.slice(-3);
+            if (imgType == "gif") {
+                img.src = img.src.slice(0, -3) + "png";
+            }
+        }
+    }
+}
+
 // Handles form validation for user sign up
 function handleSignUp(e) {
-    e.preventDefault();
+    e.preventDefault(); // Prevent form from reloading page
     console.log("Sign up validation");
     const form = overlayDiv.querySelector("form");
     const email = form.elements["email"].value.toLowerCase();
     const password = form.elements["password"].value;
     const passwordConfirm = form.elements["confirmPassword"].value;
+    const emailErrorDisplay = form.querySelector("#emailError");
+    const passwordErrorDisplay = form.querySelector("#passwordError");
 
     const emailErrors = validateEmail();
     const passwordErrors = validatePassword();
 
-    if (!(emailErrors || passwordErrors)) {
-        console.log("No signup errors!");
+    if (!(emailErrors || passwordErrors)) { // If there are no errors with either field, handle signing up.
         // Create the user object for local storage.
         const userObject = {
-            email: email.toLowerCase(),
-            password: password.value
+            email: email,
+            password: password
         };
+        const userStorage = JSON.parse(localStorage.getItem("users"));
+        form.reset();
+        emailErrorDisplay.textContent = ""; // Reset email error to have no text content.
+        passwordErrorDisplay.textContent = ""; // Reset password error to have no text content.
+        userStorage.push(userObject);
+        localStorage.setItem("users", JSON.stringify(userStorage));
+        alert("Sign up was successful!");
     } else { // Validation failed, so form should not be submitted.
-        console.log("Found signup errors!");
-    }
-
-    function checkUpperLower(word) {
-        let countLower = 0;
-        let countUpper = 0;
-        for (const ch in word) {
-            if (ch >= "a" && ch <= "z") {
-                countLower++;
-            } else if (ch >= "A" && ch <= "Z") {
-                countUpper++;
-            }
-            if (countLower > 0 && countUpper > 0) {
-                return true;
-            }
-        }
-        return false;
+        console.log("Sign up errors!")
+        emailErrorDisplay.textContent = (emailErrors) ? emailErrors : ""; // Show an error if it exists, otherwise don't.
+        passwordErrorDisplay.textContent = (passwordErrors) ? passwordErrors : ""; // Show an error if it exists, otherwise don't.
     }
 
     function validateEmail() {
+        console.log("Email exists? ", emailExists(email))
         if (!email) {
-            return "The email cannot be blank.";
+            return "Email cannot be blank.";
         } else if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-            return "The email must be a valid email address.";
+            return "Must be a valid email address.";
         } else if (emailExists(email)) {
-            return "That email is already taken.";
+            return "Email is already taken.";
         }
+        return "";
     }
 
     function validatePassword() {
-        if (!password) {
-            return "Passwords must be at least 10 characters long.";
+        if (password === "") {
+            return "Password cannot be blank.";
+        } else if (password.length < 10) {
+            return "Must be at least 10 characters long.";
         } else if (!password.match(/\W/)) {
-            return "Passwords must contain at least one special character.";
+            return "Must contain at least one special character.";
         } else if (password.toLowerCase().match(/password/)) {
-            return 'Passwords cannot contain the word "password" (uppercase, lowercase, or mixed).';
-        } else if (checkUpperLower(password)) {
-            return "Password must contain at least one uppercase and lowercase character."
+            return 'Cannot contain the word "password".';
         } else if (password != passwordConfirm) {
-            return "Both password must match.";
+            return "Both passwords must match.";
         }
+        return "";
     }
 }
 
+// Handles form validation for user login
 function handleLogin(e) {
-    e.preventDefault();
+    e.preventDefault(); // Prevent form from reloading page
     console.log("Login validation");
     const form = overlayDiv.querySelector("form");
     const email = form.elements["email"].value.toLowerCase();
     const password = form.elements["password"].value;
+    const emailErrorDisplay = form.querySelector("#emailError");
+    const passwordErrorDisplay = form.querySelector("#passwordError");
 
-    // Handle login form
-    if (form.children[0].textContent === "Login") {
+    const emailErrors = validateEmail();
+    const passwordErrors = validatePassword();
 
-
-    } else { // Handle sign up form
-
-
+    if (!(emailErrors && passwordErrors)) {
+        console.log("Login success!");
+        emailErrorDisplay.textContent = ""; // Reset email error to have no text content.
+        passwordErrorDisplay.textContent = ""; // Reset password error to have no text content.
+        form.reset();
+        alert("Login was successful!");
+    } else {
+        console.log("Login error!");
+        emailErrorDisplay.textContent = (emailErrors) ? emailErrors : ""; // Show an error if it exists, otherwise don't.
+        passwordErrorDisplay.textContent = (passwordErrors) ? passwordErrors : ""; // Show an error if it exists, otherwise don't.
     }
 
     function validatePassword() {
         if (!password) {
-
+            return "Password cannot be blank.";
+        } else {
+            return (validateLoginInfo(email, password)) ? "" : "Incorect Password.";
         }
     }
 
     function validateEmail() {
         if (!email) {
-            return "The email cannot be blank.";
+            return "Email cannot be blank.";
         } else if (!emailExists(email)) {
             return "An account with this email does not exist.";
         }
+        return "";
+    }
+
+    function validateLoginInfo(email, password) {
+        const userObjects = JSON.parse(localStorage.getItem("users")); // Retrieve array of user objects
+        if (userObjects.length > 0) {
+            for (const user of userObjects) {
+                if (user.email === email && user.password === password) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
 
-// Create the function to show alerts for invalid guesses. Use setTimeOut or something for delaying so the alert is displayed for a reasonable amount of time.
-
-// Create the results pop up, settings pop up, and instructions pop up.
-// Maybe for results, show how long it took for each guess (maybe) and number of guesses it took
+// Bonus todos:
+// Create the settings pop up, and instructions pop up.
 // Settings - dark mode toggle (do research)
 // Instructions - Just show how to play the game. Maybe an interactive side scroller with guesses and examples?
-// Form validation!
-// Go back to rubric and see what needs to be added (what is missing?)
 
-// Adding eventlisteners
+// Web keyboard responsiveness
 webKeyboard.addEventListener("mouseover", handleKeyHover);
 webKeyboard.addEventListener("mouseout", handleKeyHover);
 webKeyboard.addEventListener("click", handleWebKeyboard);
 
+// Span responsiveness for nav bar login/signup
 loginSignUpDiv.addEventListener("click", handleSpanClick);
 loginSignUpDiv.addEventListener("mouseover", handleSpanHover);
 loginSignUpDiv.addEventListener("mouseout", handleSpanHover);
 
+// User input responsiveness
 document.body.addEventListener("keydown", handleUserKeyboard);
+
+// Closing pop up overlay by clicking on it
 overlayDiv.addEventListener("click", closeOverlay);
 
+// Initialize the local storage for users.
 if (!localStorage.getItem("users")) {
     localStorage.setItem("users", JSON.stringify([]));
 }
-console.log(localStorage);
+// console.log(localStorage);

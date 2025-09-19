@@ -38,6 +38,7 @@ nav > h1 {
 }
 
 #resultsBtn {
+    visibility: hidden;
     width: 35px;
     height: 35px;
     background-image: url(./images/results-dark.png);
@@ -136,9 +137,10 @@ nav > h1 {
     position: absolute;
     border-radius: 10px;
     bottom: 40%;
-    left: calc(50% - 120px);
+    left: 50%;
+    transform: translateX(-50%);
     background-color: rgba(55, 55, 55, 0.8);
-    width: 240px;
+    width: 320px;
     height: 60px;
     display: none;
 }
@@ -208,45 +210,18 @@ nav > h1 {
     height: 100%;
     width: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 10;
     display: none;
 }
 
 /* Form overlay (child of overlay) */
 .loginsignupform {
     position: relative;
-    flex-wrap: wrap;
     background-color: #282828;
     height: 550px;
-    width: 400px;
+    width: 450px;
     border-radius: 22px;
     box-shadow: 2px 4px rgba(55, 55, 55, 0.4);
-    z-index: 101;
 }
-
-#signup-form {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    height: 100%;
-}
-
-#login-form {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    height: 100%;
-}
-
-form > h1 {
-    font-size: 45px;
-    margin: 30px 0 10px 0;
-}
-
-form > p {
-    margin-bottom: 20px;
-}
-
 
 button.login, p.login {
     background-color: rgb(22, 141, 221);
@@ -264,7 +239,15 @@ span.signup {
     color: rgb(197, 159, 52);
 }
 
+form > h1 {
+    top: 40px;
+    text-align: center;
+    font-size: 45px;
+    margin: 0;
+}
+
 #form-mode {
+    top: 120px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -273,6 +256,44 @@ span.signup {
     border: 1px solid #555;
     margin-bottom: 30px;
     border-radius: 10px;
+}
+
+#signup-form > *{
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+form#signup-form #emailError {
+    top: 246px;
+}
+
+form#signup-form #passwordError {
+    top: 326px;
+}
+
+form#signup-form [type="email"] {
+    top: 200px;
+}
+
+form#signup-form [name="password"] {
+    top: 278px;
+}
+
+form#signup-form [name="confirmPassword"] {
+    top: 356px;
+}
+
+form#signup-form #text-recommend {
+    text-align: center;
+    width: 250px;
+    bottom: 20px;
+}
+
+#login-form > *{
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .unselected {
@@ -298,18 +319,52 @@ span.signup {
 }
 
 .field {
+    position: absolute;
     box-sizing: border-box;
     border: none;
     height: 40px;
-    width: 260px;
+    width: 300px;
     padding: 4px 10px;
-    margin-bottom: 15px;
+    margin: 0;
     border-radius: 10px;
 }
 
+form#login-form #emailError {
+    top: 280px;
+}
+
+form#login-form #passwordError {
+    top: 370px;
+}
+
+form#login-form [type="email"] {
+    top: 230px;
+}
+
+form#login-form [type="password"] {
+    top: 320px;
+}
+
+form#login-form #text-recommend {
+    text-align: center;
+    width: 250px;
+    bottom: 20px;
+}
+
+.form-error {
+    left: 80px !important;
+    transform: none !important;
+    padding: 0;
+    color: red;
+    margin: 0;
+    height: 18px;
+    width: 300px;
+}
+
 #submit {
+    bottom: 90px;
     height: 48px;
-    width: 260px;
+    width: 300px;
     color: #fff;
     border: none;
     border-radius: 10px;
@@ -321,10 +376,6 @@ span.signup {
 #submit:hover {
     cursor: pointer;
     filter: brightness(110%);
-}
-
-#form-errors {
-    display: none;
 }
 
 /* Results overlay (child of overlay) */

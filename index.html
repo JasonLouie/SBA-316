@@ -7,36 +7,38 @@
         <link rel="stylesheet" href="./styles.css" />
     </head>
     <body>
-        <nav>
-            <h1>WORDLE</h1>
-            <button
-                type="button"
-                value="results"
-                class="navElement"
-                id="resultsBtn"
-            ></button>
-            <button
-                type="button"
-                value="settings"
-                class="navElement"
-                id="settingsBtn"
-            ></button>
-            <button
-                type="button"
-                value="instructions"
-                class="navElement"
-                id="instructionsBtn"
-            >
-                ?
-            </button>
-            <div id="login-signup-div">
-                <span id="loginNav">Login</span>
-                /
-                <span id="signupNav">Sign Up</span>
-            </div>
-        </nav>
-        <div id="container">
-            <main id="wordle">
+        <header>
+            <nav>
+                <h1>WORDLE</h1>
+                <button
+                    type="button"
+                    value="results"
+                    class="navElement"
+                    id="resultsBtn"
+                ></button>
+                <button
+                    type="button"
+                    value="settings"
+                    class="navElement"
+                    id="settingsBtn"
+                ></button>
+                <button
+                    type="button"
+                    value="instructions"
+                    class="navElement"
+                    id="instructionsBtn"
+                >
+                    ?
+                </button>
+                <div id="login-signup-div">
+                    <span id="loginNav">Login</span>
+                    /
+                    <span id="signupNav">Sign Up</span>
+                </div>
+            </nav>
+        </header>
+        <main id="container">
+            <div id="wordle">
                 <div id="guesses">
                     <div class="guess">
                         <p class="letter"></p>
@@ -82,7 +84,7 @@
                     </div>
                 </div>
                 <div id="alert">
-                    <p id="alertText">Word does not exist</p>
+                    <p id="alertText"></p>
                 </div>
                 <div id="keyboard">
                     <div class="keyRow">
@@ -184,28 +186,11 @@
                         ></button>
                     </div>
                 </div>
-            </main>
-            <div id="overlay">
-                <!-- <div id="results">
-                    <h1>Results</h1>
-                    <img
-                        src="./images/congratulations.png"
-                        alt="Cute animal spreading confetti in celebration"
-                        class="pic"
-                    />
-                    <p id="message">Congratulations! You successfully guessed today's word!</p>
-                    <div id="stats">
-                        <p>It took you X guesses!</p>
-                        <p>Completed the game in 00:00</p>
-                    </div>
-                    <p id="plugForAcc">Want to view your past results?</p>
-                    <p id="formOptions">
-                        <span class="login">Login</span> or
-                        <span class="signup">Sign Up</span>
-                    </p>
-                </div> -->
             </div>
-        </div>
+            <div id="overlay">
+                
+            </div>
+        </main>
         <script src="./script.js"></script>
     </body>
 </html>

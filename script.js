@@ -424,21 +424,10 @@ function closeOverlay(e) {
     if (e.target === e.currentTarget) { // Clicked outside of the overlay
         overlayDiv.style.display = "none";
         overlayDiv.removeChild(overlayDiv.firstElementChild);
-        document.body.addEventListener("keydown", handleUserKeyboard);
-    }
-}
-
-// Checks if email exists in localStorage
-function emailExists(email) {
-    const userObjects = JSON.parse(localStorage.getItem("users")); // Retrieve array of user objects
-    if (userObjects.length > 0) {
-        for (const user of userObjects) {
-            if (user.email === email) {
-                return true;
-            }
+        if (timeElapsed === ""){ // Only reactivate this event listener if game isn't done. This variable is non-empty when the game ends.
+            document.body.addEventListener("keydown", handleUserKeyboard);
         }
     }
-    return false;
 }
 
 // Handles switching from png to gif for results pic. When cursor is in the overlayDiv only, pause. If the cursor is anywhere inside the child element, animate (turn it back into a gif).
@@ -458,6 +447,19 @@ function handleImgHover(e) {
             }
         }
     }
+}
+
+// Checks if email exists in localStorage
+function emailExists(email) {
+    const userObjects = JSON.parse(localStorage.getItem("users")); // Retrieve array of user objects
+    if (userObjects.length > 0) {
+        for (const user of userObjects) {
+            if (user.email === email) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 // Handles form validation for user sign up

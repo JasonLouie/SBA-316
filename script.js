@@ -40,7 +40,7 @@ const loginForm = {
     p: { id: "text-recommend", innerHTML: `Don't have an account? <span class="signup">Sign Up</span>` }
 };
 
-const resultsForm = {
+const resultsObj = {
     h1: { textContent: "Results" },
     mainText: { // paragraph element
         textContent: {
@@ -67,6 +67,20 @@ const resultsForm = {
     ]
 };
 
+const settingsObj = {
+    h1: {textContent: "Settings"},
+    div: {id: "settings", children: [
+        {id: "dark-mode", classList: "setting", children: {
+            p: {textContent: "Dark Mode"},
+            div: {classList: "options on", childAttr: {classList: "btn on"}}
+        }},
+        {id: "web-keyboard", classList: "setting", children: {
+            p: {textContent: "Web Keyboard"},
+            div: {classList: "options on", childAttr: {classList: "btn on"}}
+        }},
+    ]}
+}
+
 const wordList = ["audio", "range", "avert", "house", "latch", "itchy", "sully", "trust"];
 // const validGuesses = []; // To be implemented. Need to use an API to fetch lots of words.
 const answer = wordList[Math.floor(Math.random() * wordList.length)];
@@ -84,6 +98,7 @@ const webKeyboard = document.getElementById("keyboard");
 const loginSignUpDiv = document.getElementById("login-signup-div");
 const overlayDiv = document.getElementById("overlay");
 const resultsBtn = document.getElementById("resultsBtn");
+const settingsBtn = document.getElementById("settingsBtn");
 const gameContainer = document.getElementById("wordle");
 
 // Handles hovering over spans (expected to be login/sign up text)
@@ -182,13 +197,11 @@ function handleInput(letter) {
 
     // Shows error to the user
     function createError(errorMsg) {
-        const errorDiv = document.createElement("div");
+        const errorDiv = gameContainer.appendChild(document.createElement("div"));
         errorDiv.id = "alert";
-        const errorP = document.createElement("p");
+        const errorP = errorDiv.appendChild(document.createElement("p"));
         errorP.textContent = errorMsg;
         errorP.id = "alertText";
-        errorDiv.appendChild(errorP);
-        gameContainer.appendChild(errorDiv);
         setTimeout(() => {
             gameContainer.removeChild(errorDiv);
         }, 3000)
@@ -308,9 +321,9 @@ function handleInput(letter) {
 // Creates the frag within the overlay
 function createOverlay(category, type) {
     const frag = document.createDocumentFragment();
+    overlayDiv.removeEventListener("mouseover", handleImgHover);
+    overlayDiv.removeEventListener("mouseout", handleImgHover);
     if (category === "form" && type) {
-        overlayDiv.removeEventListener("mouseover", handleImgHover);
-        overlayDiv.removeEventListener("mouseout", handleImgHover);
         const formContainer = frag.appendChild(document.createElement("div"));
         const form = formContainer.appendChild(document.createElement("form"));
         form.addEventListener("submit", (type === "login") ? handleLogin : handleSignUp);
@@ -338,37 +351,42 @@ function createOverlay(category, type) {
                 form.appendChild(Object.assign(document.createElement(elementTag), formInfo[elementTag]));
             }
         }
-        form.querySelector("span").addEventListener("click", handleSpanClick);
+        const formBottom = form.querySelector("#text-recommend");
+        formBottom.addEventListener("click", handleSpanClick);
+        formBottom.addEventListener("mouseover", handleSpanHover);
+        formBottom.addEventListener("mouseout", handleSpanHover);
     } else if (category === "results" && type) {
         overlayDiv.addEventListener("mouseover", handleImgHover);
         overlayDiv.addEventListener("mouseout", handleImgHover);
         const divContainer = frag.appendChild(document.createElement("div"));
         divContainer.id = category;
-        for (const elementTag in resultsForm) {
+        for (const elementTag in resultsObj) {
             if (elementTag === "div") { // Handle stats
                 const div = divContainer.appendChild(document.createElement(elementTag));
-                div.id = resultsForm[elementTag].id;
+                div.id = resultsObj[elementTag].id;
                 const stat1 = div.appendChild(document.createElement("p"));
                 const stat2 = div.appendChild(document.createElement("p"));
                 timeTaken = (timeTaken) ? timeTaken : timeElapsed();
                 stat1.textContent = (type === "win") ? `It took you ${guessPos + 1} ${(guessPos + 1 === 1) ? "try" : "tries"} to guess today's word.` : countExistsAndValids();
                 stat2.textContent = `You ${(type === "win") ? "completed" : "played"} the game ${(type === "win") ? "in" : "for"} ${timeTaken}`;
             } else if (elementTag === "img") {
-                const img = divContainer.appendChild(Object.assign(document.createElement(elementTag), resultsForm[elementTag][type]));
+                const img = divContainer.appendChild(Object.assign(document.createElement(elementTag), resultsObj[elementTag][type]));
             } else if (elementTag === "p") {
-                for (const pAttr of resultsForm[elementTag]) {
+                for (const pAttr of resultsObj[elementTag]) {
                     divContainer.appendChild(Object.assign(document.createElement(elementTag), pAttr));
                 }
             } else if (elementTag === "mainText") {
                 const mainText = divContainer.appendChild(document.createElement("p"));
                 mainText.id = "message";
-                mainText.textContent = resultsForm[elementTag].textContent[type];
+                mainText.textContent = resultsObj[elementTag].textContent[type];
             } else { // h1
-                divContainer.appendChild(Object.assign(document.createElement(elementTag), resultsForm[elementTag]));
+                divContainer.appendChild(Object.assign(document.createElement(elementTag), resultsObj[elementTag]));
             }
         }
         const formOptions = divContainer.querySelector("#formOptions");
         formOptions.addEventListener("click", handleSpanClick);
+        formOptions.addEventListener("mouseover", handleSpanHover);
+        formOptions.addEventListener("mouseout", handleSpanHover);
 
         function timeElapsed() {
             const totalSeconds = Math.floor((Date.now() - start) / 1000);
@@ -412,15 +430,46 @@ function createOverlay(category, type) {
             }
         }
     } else if (category === "settings") {
-
+        const settingsContainer = frag.appendChild(document.createElement("div"));
+        settingsContainer.id = "settings-container";
+        for (const elementTag in settingsObj){
+            if (elementTag === "h1"){
+                settingsContainer.appendChild(Object.assign(document.createElement(elementTag), settingsObj[elementTag]));
+            } else { // Handle div
+                const settingsDiv = settingsContainer.appendChild(document.createElement(elementTag));
+                settingsDiv.id = settingsObj[elementTag].id;
+                for (const child of settingsObj[elementTag].children){
+                    const setting = settingsDiv.appendChild(document.createElement("div"));
+                    setting.id = child.id;
+                    setting.classList = child.classList;
+                    for (const element in child.children){
+                        if (element === "p"){ // Create p element that describes the setting
+                            setting.appendChild(Object.assign(document.createElement(element), child.children[element]));
+                        } else {
+                            const divOptions = setting.appendChild(document.createElement(element));
+                            divOptions.classList = child.children[element].classList;
+                            const btn = divOptions.appendChild(Object.assign(document.createElement("button"), child.children[element].childAttr));
+                            btn.addEventListener("click", handleToggleOnOff);
+                        }
+                    }
+                }
+            }
+        }
+        function handleToggleOnOff(e) {
+            if (e.target === e.currentTarget) { // Only do it if the button itself is clicked
+                e.target.classList.toggle("on");
+                if(e.target.classList.contains("on")){ // Setting is set to true
+                    e.target.parentElement.classList.add("on");
+                } else { // Setting is set to false
+                    e.target.parentElement.classList.remove("on");
+                }
+            }
+        }
     } else if (category === "instructions") {
-
     }
     overlayDiv.style.display = "flex";
     overlayDiv.appendChild(frag);
     const divContainer = overlayDiv.firstElementChild;
-    divContainer.addEventListener("mouseover", handleSpanHover);
-    divContainer.addEventListener("mouseout", handleSpanHover);
     divContainer.addEventListener("click", (e) => e.stopPropagation()); // Prevent clicks from reaching the overlayDiv
 }
 
@@ -580,7 +629,13 @@ function handleLogin(e) {
     }
 }
 
-// Bonus todos:
+function handleSettingsBtnClick(e) {
+    if (e.target === e.currentTarget){ // Make sure that only the button is clicked
+        createOverlay("settings");
+    }
+}
+
+// Bonus to-dos:
 // Create the settings pop up, and instructions pop up.
 // Settings - dark mode toggle (do research)
 // Instructions - Just show how to play the game. Maybe an interactive side scroller with guesses and examples?
@@ -600,6 +655,8 @@ document.body.addEventListener("keydown", handleUserKeyboard);
 
 // Closing pop up overlay by clicking on it
 overlayDiv.addEventListener("click", closeOverlay);
+
+settingsBtn.addEventListener("click", handleSettingsBtnClick);
 
 // Initialize the local storage for users.
 if (!localStorage.getItem("users")) {
